@@ -8,7 +8,7 @@ INCLUDE = include/
 RESOURCES = resources/
 BUILD = build/
 
-OBJS = $(BUILD)main.o $(BUILD)parser.o $(BUILD)image.o
+OBJS = $(BUILD)main.o $(BUILD)parser.o $(BUILD)utils.o $(BUILD)image.o
 
 LSH = $(BUILD)lsh
 
@@ -17,6 +17,9 @@ $(BUILD)main.o: $(SRC)main.cpp
 
 $(BUILD)parser.o: $(SRC)parser.cpp $(INCLUDE)parser.hpp
 	$(CC) -o $(BUILD)parser.o $(CFLAGS) -c $(SRC)parser.cpp
+
+$(BUILD)utils.o: $(SRC)utils.cpp $(INCLUDE)utils.hpp
+	$(CC) -o $(BUILD)utils.o $(CFLAGS) -c $(SRC)utils.cpp
 
 $(BUILD)image.o: $(SRC)image.cpp $(INCLUDE)image.hpp
 	$(CC) -o $(BUILD)image.o $(CFLAGS) -c $(SRC)image.cpp

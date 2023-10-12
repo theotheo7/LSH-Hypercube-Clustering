@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <list>
 #include <netinet/in.h>
 
 #include "../include/image.hpp"
@@ -17,7 +18,7 @@ public:
     Parser();
     ~Parser();
 
-    void readInputFile(std::string);
+    std::vector<Image *> readInputFile(const std::string&);
 };
 
 #endif

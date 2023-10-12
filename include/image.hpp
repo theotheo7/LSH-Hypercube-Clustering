@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 
+#include "utils.hpp"
+
 class Image {
 
 private:

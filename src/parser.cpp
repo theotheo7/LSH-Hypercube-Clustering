@@ -6,13 +6,15 @@ Parser::Parser() {}
 
 Parser::~Parser() {}
 
-void Parser::readInputFile(const std::string fileName) {
+vector<Image *> Parser::readInputFile(const string &fileName) {
     uint32_t magicNumber, imageNumber, rowNumber, columnNumber;
     ifstream ifs(fileName, ios::binary);
 
+    vector<Image *> imageVector;
+
     if (!ifs.is_open()) {
         cerr << "Failed to open the input file!" << endl;
-        return;
+        return imageVector;
     }
 
     cout << "Successfully opened the file!" << endl;
@@ -40,10 +42,16 @@ void Parser::readInputFile(const std::string fileName) {
         vector<char> inputVector(imageSize);
         ifs.read(inputVector.data(), imageSize);
 
-        auto image = new Image(i, inputVector);
+        imageVector.push_back(new Image(i, inputVector));
+    }
 
-        delete image;
+    cout << "Distance between first two images: " << dist_l2(imageVector.at(0), imageVector.at(105)) << endl;
+
+    auto it = imageVector.begin();
+    for (it; it < imageVector.end(); it++) {
+        delete *it;
     }
 
     ifs.close();
+    return imageVector;
 }
