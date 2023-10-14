@@ -17,7 +17,7 @@ vector<Image *> Parser::readInputFile(const string &fileName) {
         return imageVector;
     }
 
-    cout << "Successfully opened the file!" << endl;
+    cout << "Successfully opened the input file!" << endl;
 
     ifs.read(reinterpret_cast<char *>(&magicNumber), sizeof(int));
     magicNumber = ntohl(magicNumber);
@@ -38,7 +38,7 @@ vector<Image *> Parser::readInputFile(const string &fileName) {
 
     const uint32_t imageSize = rowNumber * columnNumber;
 
-    for (int i = 1; i <= imageNumber; i++) {
+    for (int i = 0; i < imageNumber; i++) {
         vector<char> inputVector(imageSize);
         ifs.read(inputVector.data(), imageSize);
 
@@ -47,4 +47,40 @@ vector<Image *> Parser::readInputFile(const string &fileName) {
 
     ifs.close();
     return imageVector;
+}
+
+vector<Image *> Parser::readQueryFile(const std::string &fileName) {
+    uint32_t magicNumber, imageNumber, rowNumber, columnNumber;
+    ifstream ifs(fileName, ios::binary);
+
+    vector<Image *> queryImages;
+
+    if (!ifs.is_open()) {
+        cerr << "Failed to open the query file!" << endl;
+        return queryImages;
+    }
+
+    ifs.read(reinterpret_cast<char *>(&magicNumber), sizeof(int));
+    magicNumber = ntohl(magicNumber);
+
+    ifs.read(reinterpret_cast<char *>(&imageNumber), sizeof(int));
+    imageNumber = ntohl(imageNumber);
+
+    ifs.read(reinterpret_cast<char *>(&rowNumber), sizeof(int));
+    rowNumber = ntohl(rowNumber);
+
+    ifs.read(reinterpret_cast<char *>(&columnNumber), sizeof(int));
+    columnNumber = ntohl(columnNumber);
+
+    const uint32_t imageSize = rowNumber * columnNumber;
+
+    for (int i = 0; i < 10; i++) {
+        vector<char> inputVector(imageSize);
+        ifs.read(inputVector.data(), imageSize);
+
+        queryImages.push_back(new Image(i, inputVector));
+    }
+
+    ifs.close();
+    return queryImages;
 }
