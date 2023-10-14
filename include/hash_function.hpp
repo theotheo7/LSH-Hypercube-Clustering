@@ -1,0 +1,4 @@
+#ifndef HASH_FUNCTION_HPP
+#define HASH_FUNCTION_HPP
+
+#endif

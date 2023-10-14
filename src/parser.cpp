@@ -45,13 +45,6 @@ vector<Image *> Parser::readInputFile(const string &fileName) {
         imageVector.push_back(new Image(i, inputVector));
     }
 
-    cout << "Distance between first two images: " << dist_l2(imageVector.at(0), imageVector.at(105)) << endl;
-
-    auto it = imageVector.begin();
-    for (it; it < imageVector.end(); it++) {
-        delete *it;
-    }
-
     ifs.close();
     return imageVector;
 }

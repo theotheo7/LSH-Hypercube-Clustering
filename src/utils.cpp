@@ -3,8 +3,8 @@
 using namespace std;
 
 double dist_l2(void *a, void *b) {
-    Image *imageA = (Image *) a;
-    Image *imageB = (Image *) b;
+    auto *imageA = (Image *) a;
+    auto *imageB = (Image *) b;
 
     if (imageA->getCoords().size() != imageB->getCoords().size()) {
         return -1;

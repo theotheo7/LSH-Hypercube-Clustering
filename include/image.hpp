@@ -18,7 +18,7 @@ public:
     Image(uint, std::vector<char>);
     ~Image();
 
-    int getId();
+    uint getId();
     void setId(uint);
 
     std::vector<char> getCoords();

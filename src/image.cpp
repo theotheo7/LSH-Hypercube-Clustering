@@ -9,7 +9,7 @@ Image::Image(uint newId, vector<char> newCoords) {
 
 Image::~Image() {}
 
-int Image::getId(void) {
+uint Image::getId() {
     return this->id;
 }
 
@@ -17,7 +17,7 @@ void Image::setId(uint newId) {
     id = newId;
 }
 
-vector<char> Image::getCoords(void) {
+vector<char> Image::getCoords() {
     return this->coords;
 }
 
