@@ -17,3 +17,19 @@ double dist(void *a, void *b, int k) {
 
     return pow(dist, (double) 1/k);
 }
+
+uint binaryToUint(string binary) {
+    uint decimal = 0;
+    int base = 1;
+
+    for (int i = 0; i < (int) binary.length(); i++) {
+
+        if (binary[i] == '1') {
+            decimal += base;
+        }
+
+        base *= 2;
+    }
+
+    return decimal;
+}
