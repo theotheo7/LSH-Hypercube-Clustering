@@ -7,6 +7,6 @@
 
 #include "image.hpp"
 
-double dist_l2(void *, void *);
+double dist(void *, void *, int);
 
 #endif

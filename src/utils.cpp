@@ -2,7 +2,7 @@
 
 using namespace std;
 
-double dist_l2(void *a, void *b) {
+double dist(void *a, void *b, int k) {
     auto *imageA = (Image *) a;
     auto *imageB = (Image *) b;
 
@@ -12,8 +12,8 @@ double dist_l2(void *a, void *b) {
 
     double dist = 0.0;
     for (size_t i = 0; i < imageA->getCoords().size(); i++) {
-        dist += pow((double) (imageA->getCoords().at(i) - imageB->getCoords().at(i)), 2);
+        dist += pow((double) (imageA->getCoords().at(i) - imageB->getCoords().at(i)), k);
     }
 
-    return sqrt(dist);
+    return pow(dist, (double) 1/k);
 }
