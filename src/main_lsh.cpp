@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 
     auto *parser = new Parser();
 
-    vector<Image *> images = parser->readInputFile(inputFile);
+    vector<Image> *images = parser->readInputFile(inputFile);
 
     delete parser;
 

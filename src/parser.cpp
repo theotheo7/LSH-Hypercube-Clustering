@@ -6,11 +6,11 @@ Parser::Parser() {}
 
 Parser::~Parser() {}
 
-vector<Image *> Parser::readInputFile(const string &fileName) {
+vector<Image> *Parser::readInputFile(const string &fileName) {
     uint32_t magicNumber, imageNumber, rowNumber, columnNumber;
     ifstream ifs(fileName, ios::binary);
 
-    vector<Image *> imageVector;
+    auto *imageVector = new vector<Image>;
 
     if (!ifs.is_open()) {
         cerr << "Failed to open the input file!" << endl;
@@ -37,23 +37,24 @@ vector<Image *> Parser::readInputFile(const string &fileName) {
     cout << "Column number is: " << columnNumber << endl;
 
     const uint32_t imageSize = rowNumber * columnNumber;
+    vector<unsigned char> inputVector(imageSize);
 
     for (int i = 0; i < imageNumber; i++) {
-        vector<char> inputVector(imageSize);
-        ifs.read(inputVector.data(), imageSize);
 
-        imageVector.push_back(new Image(i, inputVector));
+        ifs.read(reinterpret_cast<char *>(inputVector.data()), imageSize);
+
+        imageVector->emplace_back(i+1, inputVector);
     }
 
     ifs.close();
     return imageVector;
 }
 
-vector<Image *> Parser::readQueryFile(const std::string &fileName) {
+vector<Image> *Parser::readQueryFile(const std::string &fileName) {
     uint32_t magicNumber, imageNumber, rowNumber, columnNumber;
     ifstream ifs(fileName, ios::binary);
 
-    vector<Image *> queryImages;
+    auto *queryImages = new vector<Image>;
 
     if (!ifs.is_open()) {
         cerr << "Failed to open the query file!" << endl;
@@ -75,10 +76,10 @@ vector<Image *> Parser::readQueryFile(const std::string &fileName) {
     const uint32_t imageSize = rowNumber * columnNumber;
 
     for (int i = 0; i < 10; i++) {
-        vector<char> inputVector(imageSize);
-        ifs.read(inputVector.data(), imageSize);
+        vector<unsigned char> inputVector(imageSize);
+        ifs.read(reinterpret_cast<char *>(inputVector.data()), imageSize);
 
-        queryImages.push_back(new Image(i, inputVector));
+        queryImages->emplace_back(i, inputVector);
     }
 
     ifs.close();

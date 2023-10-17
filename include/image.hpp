@@ -11,18 +11,18 @@ class Image {
 private:
 
     uint id;
-    std::vector<char> coords;
+    std::vector<unsigned char> coords;
 
 public:
 
-    Image(uint, std::vector<char>);
+    Image(uint, std::vector<unsigned char>);
     ~Image();
 
     uint getId();
     void setId(uint);
 
-    std::vector<char> getCoords();
-    void setCoords(std::vector<char>);
+    std::vector<unsigned char> getCoords();
+    void setCoords(std::vector<unsigned char>);
 
 };
 

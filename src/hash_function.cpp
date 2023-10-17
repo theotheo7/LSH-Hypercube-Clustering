@@ -8,20 +8,22 @@ HashFunction::HashFunction(int w): generator{(r())}, uniDistribution(0.0, (doubl
 }
 
 int HashFunction::h(void *pointer) {
-    auto *image = (Image *) pointer;
+    auto image = (Image *) pointer;
 
     double dot = 0.0;
     double rand;
+
+    vector<double> v;
 
     for (size_t i = 0; i < image->getCoords().size(); i++) {
         rand = normalDistribution(generator);
         v.push_back(rand * rand);
     }
 
-    vector<char> p = image->getCoords();
+    vector<unsigned char> p = image->getCoords();
 
     for (size_t i = 0; i < v.size(); i++) {
-        dot += p[i] * v[i];
+        dot += p.at(i) * v.at(i);
     }
 
     return floor((dot + t) / w);

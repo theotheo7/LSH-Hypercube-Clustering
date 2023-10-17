@@ -1,10 +1,12 @@
+#include <utility>
+
 #include "../include/image.hpp"
 
 using namespace std;
 
-Image::Image(uint newId, vector<char> newCoords) {
+Image::Image(uint newId, vector<unsigned char> coords) {
     this->id = newId;
-    this->coords = newCoords;
+    this->coords = coords;
 }
 
 Image::~Image() {}
@@ -17,11 +19,11 @@ void Image::setId(uint newId) {
     id = newId;
 }
 
-vector<char> Image::getCoords() {
+vector<unsigned char> Image::getCoords() {
     return this->coords;
 }
 
-void Image::setCoords(vector<char> newCoords) {
-    coords = newCoords;
+void Image::setCoords(vector<unsigned char> newCoords) {
+    coords = coords;
 }
 

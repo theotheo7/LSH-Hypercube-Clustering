@@ -10,7 +10,6 @@
 
 class HashFunction {
 private:
-    std::vector<double> v;
     double t;
     int w;
 
