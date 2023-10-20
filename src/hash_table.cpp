@@ -1,10 +1,14 @@
 #include "../include/hash_table.hpp"
+#include "../include/image.hpp"
 
 using namespace std;
+
+const unsigned long m = 4294967291; // m = (2^32) - 5
 
 inline uint HashTable::hash(uint ID) {
     return ID % this->size;
 }
+
 
 HashTable::HashTable(uint size) {
     this->size = size;
@@ -26,6 +30,7 @@ void HashTable::insert(uint ID, void *data) {
     pair<uint, void *> entry = pair<uint, void *>(ID, data);
     table[bucket]->push_back(entry);
 }
+
 
 list<pair<uint, void *>> HashTable::findBucket(uint ID) {
     uint bucket = this->hash(ID);

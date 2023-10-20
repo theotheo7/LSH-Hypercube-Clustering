@@ -27,3 +27,4 @@ void Image::setCoords(vector<unsigned char> newCoords) {
     coords = coords;
 }
 
+
