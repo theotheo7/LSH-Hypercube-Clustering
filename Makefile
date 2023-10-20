@@ -1,6 +1,6 @@
 # Compiler and compiler flags
 CC = g++
-CFLAGS = -std=c++17
+CFLAGS = -std=c++17 -Wall -Wextra -O3
 
 # Directories
 SRC = src/
