@@ -6,7 +6,6 @@
 #include <utility>
 #include <map>
 #include <list>
-#include <random>
 #include <string>
 #include <algorithm>
 
@@ -24,13 +23,15 @@ private:
     int w;
 
     HashTable *cube;
-    std::vector<std::pair<HashFunction *, std::map<uint, char>*>> vertices;
-    std::vector<Image> *data;
+    std::vector<std::pair<HashFunction *, std::unordered_map<uint, char>*>> vertices;
+    std::vector<Image *> *data;
 
 public:
 
-    HyperCube(int, int, int, int, int, std::vector<Image> *data);
+    HyperCube(int, int, int, int, int, std::vector<Image *> *data);
     ~HyperCube();
+
+    std::string project(void *);
 
     void insert(void *);
     void query(void *);

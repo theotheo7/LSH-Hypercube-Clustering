@@ -7,7 +7,7 @@
 using namespace std;
 
 // Constructor for the LSH (Locality Sensitive Hashing) class
-LSH::LSH(int k, int L,int N, int R, vector<Image> *data) {
+LSH::LSH(int k, int L,int N, int R, vector<Image *> *data) {
     
     // Initialize the given parameters
     this->k = k;
@@ -21,14 +21,14 @@ LSH::LSH(int k, int L,int N, int R, vector<Image> *data) {
     this->hashTables = new HashTable*[L];
     for (int i = 0; i < L; i++) {
         // Get the dimension of the images, default to 0 if no images present
-        int dimension = (data->size() > 0) ? static_cast<int>(data->at(0).getCoords().size()) : 0;
+        int dimension = (data->size() > 0) ? static_cast<int>(data->at(0)->getCoords().size()) : 0;
         this->hashTables[i] = new HashTable((int)(pow(2,k) + 0.5));
     }
 
     // Populate hash tables with images
     for (auto& image : *data) {
         for (int i = 0; i < L; i++) {
-            uint imageID = image.getId();
+            uint imageID = image->getId();
             this->hashTables[i]->insert(imageID, &image);
         } 
     }

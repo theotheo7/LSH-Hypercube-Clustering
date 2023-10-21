@@ -11,12 +11,12 @@ class LSH
 {
 private:
     int k, L, N, R, w;
-    std::vector<Image> *data;
+    std::vector<Image *> *data;
     HashTable **hashTables;
 
 public:
     // Constructor
-    LSH(int k, int L, int N, int R, std::vector<Image> *data);
+    LSH(int k, int L, int N, int R, std::vector<Image *> *data);
     
     // Approximate k-Nearest Neighbors method
     std::vector<std::pair<double, Image*>> approximateNN(Image* q, unsigned int k);

@@ -13,8 +13,8 @@ private:
     double t;
     int w;
 
-    std::random_device r;
-    std::default_random_engine generator;
+    std::random_device rd;
+    std::mt19937 generator;
     std::normal_distribution<double> normalDistribution;
     std::uniform_real_distribution<double> uniDistribution;
 
@@ -22,6 +22,8 @@ public:
     HashFunction(int);
 
     int h(void *);
+
+    int coinFlip();
 
 };
 

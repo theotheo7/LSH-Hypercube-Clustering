@@ -18,8 +18,8 @@ public:
     Parser();
     ~Parser();
 
-    std::vector<Image> *readInputFile(const std::string&);
-    std::vector<Image> *readQueryFile(const std::string&);
+    std::vector<Image *> *readInputFile(const std::string&);
+    std::vector<Image *> *readQueryFile(const std::string&);
 };
 
 #endif

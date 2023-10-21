@@ -6,11 +6,11 @@ Parser::Parser() {}
 
 Parser::~Parser() {}
 
-vector<Image> *Parser::readInputFile(const string &fileName) {
+vector<Image *> *Parser::readInputFile(const string &fileName) {
     uint32_t magicNumber, imageNumber, rowNumber, columnNumber;
     ifstream ifs(fileName, ios::binary);
 
-    auto *imageVector = new vector<Image>;
+    auto imageVector = new vector<Image *>;
 
     if (!ifs.is_open()) {
         cerr << "Failed to open the input file!" << endl;
@@ -39,22 +39,24 @@ vector<Image> *Parser::readInputFile(const string &fileName) {
     const uint32_t imageSize = rowNumber * columnNumber;
     vector<unsigned char> inputVector(imageSize);
 
-    for (int i = 0; i < imageNumber; i++) {
+    for (uint i = 0; i < imageNumber; i++) {
 
         ifs.read(reinterpret_cast<char *>(inputVector.data()), imageSize);
 
-        imageVector->emplace_back(i+1, inputVector);
+        imageVector->push_back(new Image(i+1, inputVector));
     }
+
+    cout << "Finished reading images!" << endl;
 
     ifs.close();
     return imageVector;
 }
 
-vector<Image> *Parser::readQueryFile(const std::string &fileName) {
+vector<Image *> *Parser::readQueryFile(const std::string &fileName) {
     uint32_t magicNumber, imageNumber, rowNumber, columnNumber;
     ifstream ifs(fileName, ios::binary);
 
-    auto *queryImages = new vector<Image>;
+    auto queryImages = new vector<Image *>;
 
     if (!ifs.is_open()) {
         cerr << "Failed to open the query file!" << endl;
@@ -74,12 +76,12 @@ vector<Image> *Parser::readQueryFile(const std::string &fileName) {
     columnNumber = ntohl(columnNumber);
 
     const uint32_t imageSize = rowNumber * columnNumber;
+    vector<unsigned char> inputVector(imageSize);
 
     for (int i = 0; i < 10; i++) {
-        vector<unsigned char> inputVector(imageSize);
         ifs.read(reinterpret_cast<char *>(inputVector.data()), imageSize);
 
-        queryImages->emplace_back(i, inputVector);
+        queryImages->push_back(new Image(i+1, inputVector));
     }
 
     ifs.close();

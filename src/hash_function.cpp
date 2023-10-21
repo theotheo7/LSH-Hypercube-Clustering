@@ -2,7 +2,7 @@
 
 using namespace std;
 
-HashFunction::HashFunction(int w): generator{(r())}, uniDistribution(0.0, (double) w) {
+HashFunction::HashFunction(int w): generator((rd())), uniDistribution(0.0, (double) w) {
     this->w = w;
     this->t = uniDistribution(generator);
 }
@@ -27,4 +27,10 @@ int HashFunction::h(void *pointer) {
     }
 
     return floor((dot + t) / w);
+}
+
+int HashFunction::coinFlip() {
+    std::uniform_int_distribution<int> distribution(0, 1);
+
+    return distribution(generator);
 }
