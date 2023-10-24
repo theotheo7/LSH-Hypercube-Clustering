@@ -8,6 +8,8 @@
 #include <list>
 #include <string>
 #include <algorithm>
+#include <fstream>
+#include <queue>
 
 #include "hash_table.hpp"
 #include "hash_function.hpp"
@@ -26,9 +28,11 @@ private:
     std::vector<std::pair<HashFunction *, std::unordered_map<uint, char>*>> vertices;
     std::vector<Image *> *data;
 
+    std::ofstream output;
+
 public:
 
-    HyperCube(int, int, int, int, int, std::vector<Image *> *data);
+    HyperCube(int, int, int, int, int, std::vector<Image *> *data, std::string);
     ~HyperCube();
 
     std::string project(void *);
@@ -36,7 +40,9 @@ public:
     void insert(void *);
     void query(void *);
 
-    std::vector<double> getTrueNeighbors(void *);
+    std::priority_queue<double, std::vector<double>, std::greater<>> getTrueNeighbors(void *);
+
+    void outputResults(std::vector<std::pair<uint, double>>, std::priority_queue<double, std::vector<double>, std::greater<>>, const std::list<uint>&, void *, double, double);
 
 };
 

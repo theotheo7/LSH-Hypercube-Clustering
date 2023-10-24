@@ -2,7 +2,7 @@
 
 using namespace std;
 
-HyperCube::HyperCube(int k, int M, int probes, int N, int R, std::vector<Image *> *data) {
+HyperCube::HyperCube(int k, int M, int probes, int N, int R, vector<Image *> *data, string outputFile) {
 
     this->k = k;
     this->M = M;
@@ -11,7 +11,7 @@ HyperCube::HyperCube(int k, int M, int probes, int N, int R, std::vector<Image *
     this->R = R;
     this->data = data;
 
-    this->w = 100;
+    this->w = 10;
 
     this->vertices.reserve(k);
     this->cube = new HashTable((int)pow(2,k));
@@ -24,9 +24,17 @@ HyperCube::HyperCube(int k, int M, int probes, int N, int R, std::vector<Image *
     for (auto image : *data) {
         insert(image);
     }
+
+    output.open(outputFile, ios::trunc);
+    if (!output.is_open()) {
+        cerr << "Can't open output file!" << endl;
+        abort();
+    }
 }
 
 HyperCube::~HyperCube() {
+    output.close();
+
     delete cube;
 
     for (auto it : vertices) {
@@ -81,7 +89,7 @@ void HyperCube::query(void *pointer) {
     chrono::duration<double> tCube{}, tTrue{};
 
     auto startTrue = chrono::high_resolution_clock::now();
-    vector<double> neighborsTrue = getTrueNeighbors(image);
+    priority_queue<double, vector<double>, greater<>> neighborsTrue = getTrueNeighbors(image);
     auto endTrue = chrono::high_resolution_clock::now();
 
     tTrue = endTrue - startTrue;
@@ -97,7 +105,6 @@ void HyperCube::query(void *pointer) {
     while (probesChecked < probes && pointsChecked < M) {
         neighborVertices = hammingDistance(binary, hammingDist++);
         for (auto i : *neighborVertices) {
-            cout << "Checking vertex: " << i << endl;
             neighborsID.splice(neighborsID.begin(), cube->findBucket(i));
             pointsChecked = (int) neighborsID.size();
             probesChecked++;
@@ -124,28 +131,46 @@ void HyperCube::query(void *pointer) {
 
     tCube = endCube - startCube;
 
-    for (int i = 0; i < N; i++) {
-        cout << "Nearest neighbor-" << i << ": " << neighborsCube[i].first << endl;
-        cout << "distanceCube: " << neighborsCube[i].second << endl;
-        cout << "distanceTrue: " << neighborsTrue[i] << endl;
-    }
-
-    cout << "tCube: " << tCube.count() << endl;
-    cout << "tTrue: " << tTrue.count() << endl;
-    cout << "R-near neighbors:" << endl;
-
-    for (auto r : neighborsRNear) {
-        cout << r << endl;
-    }
+    outputResults(neighborsCube, neighborsTrue, neighborsRNear, image, tCube.count(), tTrue.count());
 }
 
-vector<double> HyperCube::getTrueNeighbors(void *pointer) {
+priority_queue<double, vector<double>, greater<>> HyperCube::getTrueNeighbors(void *pointer) {
     auto image = (Image *) pointer;
-    vector<double> neighborsTrue;
+    priority_queue<double, vector<double>, greater<>> neighborsTrue;
 
     for (auto it : *this->data) {
-        neighborsTrue.push_back(dist(image, it, 2));
+        neighborsTrue.push(dist(it, image, 2));
     }
-    sort(neighborsTrue.begin(), neighborsTrue.end());
+
     return neighborsTrue;
+}
+
+void HyperCube::outputResults(vector<pair<uint, double>> neighborsCube, priority_queue<double, vector<double>, greater<>> neighborsTrue, const list<uint>& neighborsRNear, void *qImage, double tCube, double tTrue) {
+    auto image = (Image *) qImage;
+
+    string contents;
+
+    if (output.is_open()) {
+        contents.append("Query: " + to_string(image->getId()) + "\n");
+
+        for (int i = 0; i < N; i++) {
+            contents.append("Nearest neighbor-" + to_string(i+1) + ": " + to_string(neighborsCube[i].first) + "\n");
+            contents.append("distanceHypercube: " + to_string(neighborsCube[i].second) + "\n");
+            contents.append("distanceTrue: " + to_string(neighborsTrue.top()) + "\n");
+            neighborsTrue.pop();
+        }
+
+        contents.append("tCube: " + to_string(tCube) + "\n");
+        contents.append("tTrue: " + to_string(tTrue) + "\n");
+        contents.append("R-near neighbors:\n");
+
+        for (auto r : neighborsRNear) {
+            contents.append(to_string(r) + "\n");
+        }
+
+        contents.append("\n");
+
+        output << contents;
+    }
+
 }
