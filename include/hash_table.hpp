@@ -11,10 +11,6 @@ private:
 
     uint size;
 
-    unsigned long k, w, M, d;
-
-    double **s;
-
     std::vector<std::list<std::pair<uint, void *>>*> table;
 
     uint hash(uint);
