@@ -11,7 +11,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
     int opt;
     string inputFile, queryFile, outputFile;
-    int k = 4, L = 5, N = 1, R = 1000;
+    int k = 4, L = 5, N = 1, R = 10000;
 
     while((opt = getopt(argc, argv, "d:q:k:L:o:N:R:")) != -1) {
         switch (opt) {
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
 
     
 
-    auto *parser = new Parser();
+    auto parser = new Parser();
 
     // Read images and queries from files
     vector<Image *> *inputImages = parser->readInputFile("resources/input.dat");
@@ -55,28 +55,11 @@ int main(int argc, char *argv[]) {
     }*/
 
     // Initialize LSH with the parsed parameters and input images
-    LSH lsh(k, L, N, R, inputImages);
+    LSH lsh(k, L, N, R, inputImages, "resources/outputLSH.txt");
 
 	// Process each query image
-    for(auto& queryImage : *queryImages){ //may i need it const here
-        vector<pair<double, Image*>> aNN = lsh.approximateNN(queryImage, N); // Fetch the k nearest neighbors for the current query image
-        cout << "Query: " << queryImage->getId() << endl;
-        for (unsigned int j = 0; j < aNN.size(); j++) {
-                    cout << "Nearest neighbor-" << j+1 << ": " << aNN[j].second->getId() << endl;
-                    cout << "distanceLSH: " << aNN[j].first << endl;
-                }
-        cout << endl;
-
-        cout << "R-near neighbors:\n";
-                vector<Image*> imagesInRange = lsh.range_search(queryImage, R);
-                if (imagesInRange.size() != 0) {
-                    for (unsigned int j = 0; j < imagesInRange.size(); j++) {
-                        cout << imagesInRange[j]->getId() << endl;
-                    }
-                } else {
-                    cout << "Not found!\n";
-                }
-        cout << endl;
+    for(auto queryImage : *queryImages){ //may i need it const here
+        lsh.query(queryImage);
     }
 
     delete parser;

@@ -13,6 +13,8 @@
 
 double dist(void *, void *, int);
 
+int euclideanModulo(int, int);
+
 uint binaryToUint(std::string);
 
 std::vector<int> *hammingDistance(const std::string&, int);

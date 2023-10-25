@@ -1,13 +1,11 @@
 #include "../include/lsh.hpp"
 
-#include <algorithm>
-#include <unordered_set> 
-#include <iostream>
-
 using namespace std;
 
+const int M = (int)pow(2, 32) - 5;
+
 // Constructor for the LSH (Locality Sensitive Hashing) class
-LSH::LSH(int k, int L,int N, int R, vector<Image *> *data) {
+LSH::LSH(int k, int L,int N, int R, vector<Image *> *data, string outputFile) {
     
     // Initialize the given parameters
     this->k = k;
@@ -17,94 +15,161 @@ LSH::LSH(int k, int L,int N, int R, vector<Image *> *data) {
     this->data = data;
     this->w = 10;
 
-    // Dynamically allocate memory for hash tables
-    this->hashTables = new HashTable*[L];
+    r.resize(L, vector<int>(0));
+
     for (int i = 0; i < L; i++) {
-        // Get the dimension of the images, default to 0 if no images present
-        int dimension = (data->size() > 0) ? static_cast<int>(data->at(0)->getCoords().size()) : 0;
-        this->hashTables[i] = new HashTable((int)(pow(2,k) + 0.5));
+        auto table = new HashTable(data->size() / 8);
+        auto hashFuncs = new vector<HashFunction *>;
+        for (int j = 0; j < k; j++) {
+            hashFuncs->push_back(new HashFunction(w));
+            r[i].push_back(rand());
+        }
+        hashTables.emplace_back(table, hashFuncs);
     }
 
     // Populate hash tables with images
-    for (auto& image : *data) {
-        for (int i = 0; i < L; i++) {
-            uint imageID = image->getId();
-            this->hashTables[i]->insert(imageID, &image);
-        } 
+    for (auto image : *data) {
+        insert(image);
+    }
+
+    output.open(outputFile, ios::trunc);
+    if (!output.is_open()) {
+        cerr << "Can't open output file!" << endl;
+        abort();
     }
 }
 
-// Function to get approximately nearest neighbors of a given image 'q' using LSH
-vector<pair<double, Image*>> LSH::approximateNN(Image* q, unsigned int k) {
-    vector<pair<double, Image*>> neighbors;
-    unordered_set<uint> iterator;
+void LSH::insert(Image *image) {
 
     for (int i = 0; i < L; i++) {
-        // Retrieve the list of images in the same bucket as the query image 'q'
-        list<pair<uint,void*>> bucket = this->hashTables[i]->findBucket(q->getId());
+        int ID = 0;
+        for (int j = 0; j < k; j++) {
+            ID += r[i][j] * hashTables[i].second->at(j)->h(image);
+        }
+        ID = euclideanModulo(ID, M);
+        hashTables[i].first->insert((uint)ID, image);
+    }
 
-        // Iterate over each image in the bucket
-        for (const auto& entry : bucket){
-            Image* currImage = static_cast<Image*>(entry.second);
-            uint imageID = currImage->getId();
+}
 
-            // Check if the image has already been considered
-            if (iterator.find(imageID) == iterator.end()){
-                iterator.insert(imageID);
-                double distance = dist(q,currImage,k);
-                neighbors.push_back(make_pair(distance,currImage));
+// Function to get approximately nearest neighbors of a given image 'q' using LSH
+void LSH::query(Image* q) {
+    list<pair<uint, void *>> neighborsID, neighborsBucket;
+    vector<int> IDs;
+    vector<pair<uint, double>> neighborsLSH;
+    list<uint> neighborsRNear;
+
+    chrono::duration<double> tLSH{}, tTrue{};
+
+    auto startTrue = chrono::high_resolution_clock::now();
+    vector<double> neighborsTrue = getTrueNeighbors(q);
+    auto endTrue = chrono::high_resolution_clock::now();
+
+    tTrue = endTrue - startTrue;
+
+    auto startLSH = chrono::high_resolution_clock::now();
+    for (int i = 0; i < L; i++) {
+        int ID = 0;
+        for (int j = 0; j < k; j++) {
+            ID += r[i][j] * hashTables[i].second->at(j)->h(q);
+        }
+        IDs.push_back(euclideanModulo(ID, M));
+        neighborsID.splice(neighborsID.end(), hashTables[i].first->findSameID(ID));
+        neighborsBucket.splice(neighborsBucket.end(), hashTables[i].first->findBucket(ID));
+    }
+
+    if (neighborsID.size() >= (size_t) N) {
+        for (auto nID : neighborsID) {
+            auto neighbor = (Image *) nID.second;
+            double distance = dist(q, neighbor, 2);
+            if (distance < R) {
+                neighborsRNear.push_back(neighbor->getId());
             }
+            neighborsLSH.emplace_back(neighbor->getId(), distance);
+        }
+    } else {
+        for (auto nBucket : neighborsBucket) {
+            auto neighbor = (Image *) nBucket.second;
+            double distance = dist(q, neighbor, 2);
+            if (distance < R) {
+                neighborsRNear.push_back(neighbor->getId());
+            }
+            neighborsLSH.emplace_back(neighbor->getId(), distance);
         }
     }
 
     // Sort the neighbors based on distance
-    sort(neighbors.begin(), neighbors.end());
+    sort(neighborsLSH.begin(), neighborsLSH.end(), sortPairBySecond);
+    set<uint> setRNear(neighborsRNear.begin(), neighborsRNear.end());
 
-    // Resize the neighbors list if it's larger than k
-    if (neighbors.size() > k){
-        neighbors.resize(k);
-    }
+    auto endLSH = chrono::high_resolution_clock::now();
 
-    return neighbors;
+    tLSH = endLSH - startLSH;
+
+    outputResults(neighborsLSH, neighborsTrue, setRNear, q, tLSH.count(), tTrue.count());
 }
 
-// Function to find all images within a certain distance 'R' of a given image 'q'
-vector<Image*> LSH::range_search(Image* q, double R) {
-    vector<Image*> finalImages;
-    unordered_set<uint> iterator;
+std::vector<double> LSH::getTrueNeighbors(Image *image) {
+    priority_queue<double, vector<double>, less<>> pqTrue;
 
-    for (int i = 0; i < L; i++) {
-        // Retrieve the list of images in the same bucket as the query image 'q'
-        list<pair<uint,void*>> bucket = this->hashTables[i]->findBucket(q->getId());
-
-        // Iterate over each image in the bucket
-        for (const auto& entry : bucket){
-            Image* currImage = static_cast<Image*>(entry.second);
-            uint imageID = currImage->getId();
-
-            // Check if the image has already been considered
-            if (iterator.find(imageID) == iterator.end()){
-                iterator.insert(imageID);
-                double distance = dist(q,currImage,k);
-                
-                // Add the image if its distance is less than or equal to 'R'
-                if (distance <= R){
-                    finalImages.push_back(currImage);
-                }
-            }
+    for (auto it : *this->data) {
+        pqTrue.push(dist(it, image, 2));
+        if (pqTrue.size() > (size_t) N) {
+            pqTrue.pop();
         }
     }
 
-    return finalImages;
+    vector<double> neighborsTrue;
+
+    while (!pqTrue.empty()) {
+        neighborsTrue.push_back(pqTrue.top());
+        pqTrue.pop();
+    }
+
+    return neighborsTrue;
+}
+
+void LSH::outputResults(vector<pair<uint, double>> neighborsLSH,
+                        vector<double> neighborsTrue, const set<uint>& neighborsRNear,
+                        Image *q, double tLSH, double tTrue) {
+    string contents;
+
+    if (output.is_open()) {
+        contents.append("Query: " + to_string(q->getId()) + "\n");
+
+        for (int i = 0; i < N; i++) {
+            contents.append("Nearest neighbor-" + to_string(i+1) + ": " + to_string(neighborsLSH[i].first) + "\n");
+            contents.append("distanceLSH: " + to_string(neighborsLSH[i].second) + "\n");
+            contents.append("distanceTrue: " + to_string(neighborsTrue[i]) + "\n");
+        }
+
+        contents.append("tLSH: " + to_string(tLSH) + "\n");
+        contents.append("tTrue: " + to_string(tTrue) + "\n");
+        contents.append("R-near neighbors:\n");
+
+        for (auto nRNear : neighborsRNear) {
+            contents.append(to_string(nRNear) + "\n");
+        }
+
+        contents.append("\n");
+
+        output << contents;
+    }
 }
 
 // Destructor for the LSH class
 LSH::~LSH() {
+    delete data;
+
     // Delete each hash table
     for (int i = 0; i < L; i++) {
-        delete hashTables[i];
+        delete hashTables[i].first;
+        for (auto hFunc : *hashTables[i].second) {
+            delete hFunc;
+        }
+        delete hashTables[i].second;
     }
 
-    // Delete the array holding pointers to hash tables
-    delete[] hashTables;
+    output.close();
+
 }

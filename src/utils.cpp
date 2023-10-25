@@ -12,10 +12,20 @@ double dist(void *a, void *b, int k) {
 
     double dist = 0.0;
     for (size_t i = 0; i < imageA->getCoords().size(); i++) {
-        dist += pow((double) (imageA->getCoords().at(i) - imageB->getCoords().at(i)), k);
+        double diff = imageA->getCoords().at(i) - imageB->getCoords().at(i);
+        dist += diff * diff;
     }
 
-    return pow(dist, (double) 1/k);
+    return sqrt(dist);
+}
+
+int euclideanModulo(int a, int b) {
+    int mod = a%b;
+    if (mod < 0) {
+        if (b < 0) mod-= b;
+        else mod+= b;
+    }
+    return mod;
 }
 
 uint binaryToUint(string binary) {
