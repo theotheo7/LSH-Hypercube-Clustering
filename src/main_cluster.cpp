@@ -66,6 +66,9 @@ int main(int argc, char **argv) {
 
     int numOfPoints = points->size();
 
+    //kpp first
+    
+
     vector<Point> *centroids = lloyd(points, numOfPoints, k, 10);
 
     //FINISH LSH 

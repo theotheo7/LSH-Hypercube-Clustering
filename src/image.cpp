@@ -27,4 +27,11 @@ void Image::setCoords(vector<unsigned char> newCoords) {
     coords = coords;
 }
 
+uint Image::getCluster() {
+    return this->cluster;
+}
+
+void Image::setCluster(uint newCluster) {
+    cluster = newCluster;
+}
 

@@ -12,6 +12,7 @@ private:
 
     uint id;
     std::vector<unsigned char> coords;
+    uint cluster;
 
 public:
 
@@ -23,6 +24,9 @@ public:
 
     std::vector<unsigned char> getCoords();
     void setCoords(std::vector<unsigned char>);
+
+    uint getCluster();
+    void setCluster(uint);
 
 };
 
