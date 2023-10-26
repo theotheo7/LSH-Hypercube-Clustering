@@ -16,7 +16,7 @@
 #include "../include/image.hpp"
 
 
-class Cluster{
+class Cluster {
 private:
 
     int k;

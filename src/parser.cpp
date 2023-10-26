@@ -53,7 +53,7 @@ vector<Image *> *Parser::readInputFile(const string &fileName) {
     return imageVector;
 }
 
-vector<Image *> *Parser::readQueryFile(const std::string &fileName) {
+vector<Image *> *Parser::readQueryFile(const string &fileName) {
     uint32_t magicNumber, imageNumber, rowNumber, columnNumber;
     ifstream ifs(fileName, ios::binary);
 
@@ -88,4 +88,44 @@ vector<Image *> *Parser::readQueryFile(const std::string &fileName) {
 
     ifs.close();
     return queryImages;
+}
+
+Cluster *readClusterConf(const string &fileName) {
+    int clusters;
+    int L = 3;
+    int kLSH = 4;
+    int M = 10;
+    int kCube = 3;
+    int probes = 2;
+
+    ifstream ifs(fileName);
+
+    if (!ifs.is_open()) {
+        cerr << "Failed to open the cluster conf file!" << endl;
+        return nullptr;
+    }
+
+    string line;
+    while (getline(ifs, line)) {
+        istringstream iss(line);
+        string key;
+
+        if (key == "number_of_clusters:") {
+            iss >> clusters;
+        } else if (key == "number_of_vector_hash_tables:") {
+            iss >> L;
+        } else if (key == "number_of_vector_hash_functions:") {
+            iss >> kLSH;
+        } else if (key == "max_number_M_hypercube:") {
+            iss >> M;
+        } else if (key == "number_of_hypercube_dimensions:") {
+            iss >> kCube;
+        } else if (key == "number_of_probes:") {
+            iss >> probes;
+        }
+    }
+
+    ifs.close();
+
+    return new Cluster(clusters, L, kLSH, M, kCube, probes);
 }

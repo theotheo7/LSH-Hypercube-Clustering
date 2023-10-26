@@ -6,9 +6,11 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <sstream>
 #include <netinet/in.h>
 
-#include "../include/image.hpp"
+#include "image.hpp"
+#include "cluster.hpp"
 
 class Parser {
 private:
@@ -20,6 +22,8 @@ public:
 
     std::vector<Image *> *readInputFile(const std::string&);
     std::vector<Image *> *readQueryFile(const std::string&);
+
+    Cluster *readClusterConf(const std::string&);
 };
 
 #endif
