@@ -15,15 +15,15 @@ int HashFunction::h(void *pointer) {
 
     vector<double> v;
 
-    for (size_t i = 0; i < image->getCoords().size(); i++) {
+    for (size_t i = 0; i < image->getCoords()->size(); i++) {
         rand = normalDistribution(generator);
         v.push_back(rand * rand);
     }
 
-    vector<unsigned char> p = image->getCoords();
+    vector<unsigned char> *p = image->getCoords();
 
     for (size_t i = 0; i < v.size(); i++) {
-        dot += p.at(i) * v.at(i);
+        dot += p->at(i) * v.at(i);
     }
 
     return floor((dot + t) / w);

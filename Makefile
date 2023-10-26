@@ -14,9 +14,14 @@ SRCS_LSH = $(SRC)main_lsh.cpp $(SRC)parser.cpp $(SRC)utils.cpp $(SRC)image.cpp $
 OBJS_CUBE = $(BUILD)main_cube.o $(BUILD)parser.o $(BUILD)utils.o $(BUILD)image.o $(BUILD)hash_function.o $(BUILD)hash_table.o $(BUILD)cube.o
 SRCS_CUBE = $(SRC)main_cube.cpp $(SRC)parser.cpp $(SRC)utils.cpp $(SRC)image.cpp $(SRC)hash_function.cpp $(SRC)hash_table.cpp $(SRC)cube.cpp
 
+OBJS_CLUSTER = $(BUILD)main_cluster.o $(BUILD)parser.o $(BUILD)utils.o $(BUILD)image.o $(BUILD)hash_function.o $(BUILD)hash_table.o $(BUILD)cube.o $(BUILD)lsh.o $(BUILD)cluster.o
+OBJS_CLUSTER = $(BUILD)main_cluster.cpp $(BUILD)parser.cpp $(BUILD)utils.cpp $(BUILD)image.cpp $(BUILD)hash_function.cpp $(BUILD)hash_table.cpp $(BUILD)cube.cpp $(BUILD)lsh.cpp $(BUILD)cluster.cpp
+
 LSH = $(BUILD)lsh
 
 CUBE = $(BUILD)cube
+
+CLUSTER = $(BUILD)cluster
 
 # Objects
 $(BUILD)main_lsh.o: $(SRC)main_lsh.cpp
@@ -24,6 +29,9 @@ $(BUILD)main_lsh.o: $(SRC)main_lsh.cpp
 
 $(BUILD)main_cube.o: $(SRC)main_cube.cpp
 	$(CC) -o $(BUILD)main_cube.o $(CFLAGS) -c $(SRC)main_cube.cpp
+
+$(BUILD)main_cluster.o: $(SRC)main_cluster.cpp
+	$(CC) -o $(BUILD)main_cluster.o $(CFLAGS) -c $(SRC)main_cluster.cpp
 
 $(BUILD)parser.o: $(SRC)parser.cpp $(INCLUDE)parser.hpp
 	$(CC) -o $(BUILD)parser.o $(CFLAGS) -c $(SRC)parser.cpp
@@ -46,12 +54,18 @@ $(BUILD)cube.o: $(SRC)cube.cpp $(INCLUDE)cube.hpp
 $(BUILD)lsh.o: $(SRC)lsh.cpp $(INCLUDE)lsh.hpp
 	$(CC) -o $(BUILD)lsh.o $(CFLAGS) -c $(SRC)lsh.cpp
 
+$(BUILD)cluster.o: $(SRC)cluster.cpp $(INCLUDE)cluster.hpp
+	$(CC) -o $(BUILD)cluster.o $(CFLAGS) -c $(SRC)cluster.cpp
+
 # Executables
 $(LSH): $(OBJS_LSH)
 	$(CC) $(OBJS_LSH) $(CFLAGS) -o $(LSH)
 
 $(CUBE): $(OBJS_CUBE)
 	$(CC) $(OBJS_CUBE) $(CFLAGS) -o $(CUBE)
+
+$(CLUSTER): $(OBJS_CLUSTER)
+	$(CC) $(OBJS_CLUSTER) $(CFLAGS) -o $(CLUSTER)
 
 all: $(LSH) $(CUBE)
 

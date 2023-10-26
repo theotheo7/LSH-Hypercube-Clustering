@@ -2,9 +2,9 @@
 
 using namespace std;
 
-Parser::Parser() {}
+Parser::Parser() = default;
 
-Parser::~Parser() {}
+Parser::~Parser() = default;
 
 vector<Image *> *Parser::readInputFile(const string &fileName) {
     uint32_t magicNumber, imageNumber, rowNumber, columnNumber;
@@ -43,7 +43,8 @@ vector<Image *> *Parser::readInputFile(const string &fileName) {
 
         ifs.read(reinterpret_cast<char *>(inputVector.data()), imageSize);
 
-        imageVector->push_back(new Image(i+1, inputVector));
+        auto coords = new vector<unsigned char>(inputVector);
+        imageVector->push_back(new Image(i+1, coords));
     }
 
     cout << "Finished reading images!" << endl;
@@ -81,7 +82,8 @@ vector<Image *> *Parser::readQueryFile(const std::string &fileName) {
     for (int i = 0; i < 10; i++) {
         ifs.read(reinterpret_cast<char *>(inputVector.data()), imageSize);
 
-        queryImages->push_back(new Image(i+1, inputVector));
+        auto coords = new vector<unsigned char>(inputVector);
+        queryImages->push_back(new Image(i+1, coords));
     }
 
     ifs.close();

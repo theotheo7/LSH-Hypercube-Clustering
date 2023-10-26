@@ -18,7 +18,6 @@ private:
 public:
 
     HashTable(uint);
-    HashTable(int,int,int,int);
 
     ~HashTable();
 

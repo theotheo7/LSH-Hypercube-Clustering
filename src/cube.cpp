@@ -153,19 +153,23 @@ void HyperCube::outputResults(vector<pair<uint, double>> neighborsCube, priority
     if (output.is_open()) {
         contents.append("Query: " + to_string(image->getId()) + "\n");
 
-        for (int i = 0; i < N; i++) {
-            contents.append("Nearest neighbor-" + to_string(i+1) + ": " + to_string(neighborsCube[i].first) + "\n");
-            contents.append("distanceHypercube: " + to_string(neighborsCube[i].second) + "\n");
-            contents.append("distanceTrue: " + to_string(neighborsTrue.top()) + "\n");
-            neighborsTrue.pop();
-        }
+        if (neighborsCube.empty()) {
+            contents.append("\n");
+        } else {
+            for (int i = 0; i < N; i++) {
+                contents.append("Nearest neighbor-" + to_string(i+1) + ": " + to_string(neighborsCube[i].first) + "\n");
+                contents.append("distanceHypercube: " + to_string(neighborsCube[i].second) + "\n");
+                contents.append("distanceTrue: " + to_string(neighborsTrue.top()) + "\n");
+                neighborsTrue.pop();
+            }
 
-        contents.append("tCube: " + to_string(tCube) + "\n");
-        contents.append("tTrue: " + to_string(tTrue) + "\n");
-        contents.append("R-near neighbors:\n");
+            contents.append("tCube: " + to_string(tCube) + "\n");
+            contents.append("tTrue: " + to_string(tTrue) + "\n");
+            contents.append("R-near neighbors:\n");
 
-        for (auto r : neighborsRNear) {
-            contents.append(to_string(r) + "\n");
+            for (auto r : neighborsRNear) {
+                contents.append(to_string(r) + "\n");
+            }
         }
 
         contents.append("\n");

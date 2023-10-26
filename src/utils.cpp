@@ -6,13 +6,13 @@ double dist(void *a, void *b, int k) {
     auto *imageA = (Image *) a;
     auto *imageB = (Image *) b;
 
-    if (imageA->getCoords().size() != imageB->getCoords().size()) {
+    if (imageA->getCoords()->size() != imageB->getCoords()->size()) {
         return -1;
     }
 
     double dist = 0.0;
-    for (size_t i = 0; i < imageA->getCoords().size(); i++) {
-        double diff = imageA->getCoords().at(i) - imageB->getCoords().at(i);
+    for (size_t i = 0; i < imageA->getCoords()->size(); i++) {
+        double diff = imageA->getCoords()->at(i) - imageB->getCoords()->at(i);
         dist += diff * diff;
     }
 

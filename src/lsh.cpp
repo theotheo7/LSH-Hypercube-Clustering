@@ -58,6 +58,7 @@ void LSH::query(Image* q) {
     vector<int> IDs;
     vector<pair<uint, double>> neighborsLSH;
     list<uint> neighborsRNear;
+    set<uint> neighborsSet;
 
     chrono::duration<double> tLSH{}, tTrue{};
 
@@ -73,6 +74,7 @@ void LSH::query(Image* q) {
         for (int j = 0; j < k; j++) {
             ID += r[i][j] * hashTables[i].second->at(j)->h(q);
         }
+
         IDs.push_back(euclideanModulo(ID, M));
         neighborsID.splice(neighborsID.end(), hashTables[i].first->findSameID(ID));
         neighborsBucket.splice(neighborsBucket.end(), hashTables[i].first->findBucket(ID));
@@ -81,20 +83,26 @@ void LSH::query(Image* q) {
     if (neighborsID.size() >= (size_t) N) {
         for (auto nID : neighborsID) {
             auto neighbor = (Image *) nID.second;
-            double distance = dist(q, neighbor, 2);
-            if (distance < R) {
-                neighborsRNear.push_back(neighbor->getId());
+            if (neighborsSet.find(neighbor->getId()) == neighborsSet.end()) {
+                double distance = dist(q, neighbor, 2);
+                if (distance < R) {
+                    neighborsRNear.push_back(neighbor->getId());
+                }
+                neighborsLSH.emplace_back(neighbor->getId(), distance);
+                neighborsSet.insert(neighbor->getId());
             }
-            neighborsLSH.emplace_back(neighbor->getId(), distance);
         }
     } else {
         for (auto nBucket : neighborsBucket) {
             auto neighbor = (Image *) nBucket.second;
-            double distance = dist(q, neighbor, 2);
-            if (distance < R) {
-                neighborsRNear.push_back(neighbor->getId());
+            if (neighborsSet.find(neighbor->getId()) == neighborsSet.end()) {
+                double distance = dist(q, neighbor, 2);
+                if (distance < R) {
+                    neighborsRNear.push_back(neighbor->getId());
+                }
+                neighborsLSH.emplace_back(neighbor->getId(), distance);
+                neighborsSet.insert(neighbor->getId());
             }
-            neighborsLSH.emplace_back(neighbor->getId(), distance);
         }
     }
 

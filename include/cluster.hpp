@@ -4,8 +4,9 @@
 #include <utility>
 #include <unistd.h>
 #include <cstring>
-#include <time.h>
+#include <ctime>
 #include <vector>
+#include <algorithm>
 
 #include <random>
 #include <iterator>
@@ -18,16 +19,18 @@
 class Cluster{
 private:
 
-
-    int k = 0;
-
-    int numofhtables = 0;
-    int numofhfuncs = 0;
-    int M = 0;
-    int dim = 0;
-    int numofprobes = 0;
+    int k;
+    int tables;
+    int functions;
+    int M;
+    int dim;
+    int probes;
 
 public:
-    void kpp(std::vector<Image*> *image,int num,std::vector<Image*> *centroids,int k);
+    Cluster(int, int, int, int, int, int);
+    ~Cluster();
 
+    void kpp(std::vector<Image*> *, std::vector<Image*> *);
+
+    Image *selectRandomly(std::vector<Image *> *);
 };
