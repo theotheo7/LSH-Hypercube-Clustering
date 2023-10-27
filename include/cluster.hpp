@@ -1,3 +1,6 @@
+#ifndef CLUSTER_HPP
+#define CLUSTER_HPP
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -14,7 +17,6 @@
 #include "../include/parser.hpp"
 #include "../include/utils.hpp"
 #include "../include/image.hpp"
-
 
 class Cluster {
 private:
@@ -34,3 +36,5 @@ public:
 
     Image *selectRandomly(std::vector<Image *> *);
 };
+
+#endif

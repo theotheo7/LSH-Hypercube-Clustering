@@ -90,7 +90,7 @@ vector<Image *> *Parser::readQueryFile(const string &fileName) {
     return queryImages;
 }
 
-Cluster *readClusterConf(const string &fileName) {
+Cluster *Parser::readClusterConf(const string &fileName) {
     int clusters;
     int L = 3;
     int kLSH = 4;

@@ -12,6 +12,8 @@
 #include "image.hpp"
 #include "cluster.hpp"
 
+class Cluster;
+
 class Parser {
 private:
 

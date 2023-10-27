@@ -75,7 +75,7 @@ void Cluster::kpp(vector<Image*> *images, vector<Image*> *centroids) {
 
     // Assign each image to the closest centroid (cluster)
     for (j = 0; j < numOfImages; j++) {
-        images->at(j)->setCluster(nearestCentroid(images->at(j),centroids, k));
+        //images->at(j)->setCluster(nearestCentroid(images->at(j),centroids, k));
     }
 
 }
@@ -106,16 +106,17 @@ Image *Cluster::selectRandomly(vector<Image *> *images) {
 int nearestCentroid(Image* image, vector<Image*> *centroids, int k) {
     int i, index = 1;
     double distance, minDist;
+    Image *nearest;
 
     minDist = 1000000000000.0;
-    for (i = 0; i < k; i++) {
-        distance = dist(image, centroids->at(i),2);
+    for (auto centroid : *centroids) {
+        distance = dist(image, centroid,2);
         if (distance < minDist) {
             minDist = distance;
-            index = i;
+            image = centroid;
         }
     }
-    return index;
+    return (int) image->getId();
 }
 
 vector<Image*> *lloyd(vector<Image*> *images, int numOfImages, int k, int maxTimes) {
@@ -133,28 +134,28 @@ vector<Image*> *lloyd(vector<Image*> *images, int numOfImages, int k, int maxTim
 
     //kpp(images, numOfImages, centroids, k);
 
-    int sizeOfCoords = images->at(1)->getCoords().size();
+    int sizeOfCoords = (int) images->at(1)->getCoords()->size();
 
     do {
 
         for (i = 0; i < k; i++) {
             centroids->at(i)->setCluster(0);
-            centroids->at(i)->getCoords().clear();
+            centroids->at(i)->getCoords()->clear();
         }
 
     for (i = 0; i < numOfImages; i++) {
         index = images->at(i)->getCluster();
-        centroids->at(index).cluster++; //maybe a function ( + 1 )
+        //centroids->at(index).cluster++; //maybe a function ( + 1 )
         for (j = 0; j < sizeOfCoords; j++) {
-            newCoords.at(j) += images->at(i)->getCoords().at(j);
+            newCoords.at(j) += images->at(i)->getCoords()->at(j);
         }
     }
 
     for (i = 0; i < k; i++) {
         for (j = 0; j < sizeOfCoords; j++) {
             if (centroids->at(i)->getCluster() == 0)
-                centroids->at(i).cluster++;
-            centroids->at(i)->getCoords().at(j) /= centroids->at(i)->getCluster();
+                //centroids->at(i).cluster++;
+            centroids->at(i)->getCoords()->at(j) /= centroids->at(i)->getCluster();
         }
     }
 
