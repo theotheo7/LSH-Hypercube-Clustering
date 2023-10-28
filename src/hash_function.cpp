@@ -20,7 +20,7 @@ int HashFunction::h(void *pointer) {
         v.push_back(rand * rand);
     }
 
-    vector<unsigned char> *p = image->getCoords();
+    vector<double> *p = image->getCoords();
 
     for (size_t i = 0; i < v.size(); i++) {
         dot += p->at(i) * v.at(i);

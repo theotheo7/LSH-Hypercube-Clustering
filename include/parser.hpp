@@ -10,9 +10,9 @@
 #include <netinet/in.h>
 
 #include "image.hpp"
-#include "cluster.hpp"
+#include "clustering.hpp"
 
-class Cluster;
+class Clustering;
 
 class Parser {
 private:
@@ -25,7 +25,7 @@ public:
     std::vector<Image *> *readInputFile(const std::string&);
     std::vector<Image *> *readQueryFile(const std::string&);
 
-    Cluster *readClusterConf(const std::string&);
+    Clustering *readClusterConf(const std::string&);
 };
 
 #endif

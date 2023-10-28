@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Image::Image(uint newId, vector<unsigned char> *coords) {
+Image::Image(uint newId, vector<double> *coords) {
     this->id = newId;
     this->coords = coords;
 }
@@ -21,11 +21,11 @@ void Image::setId(uint newId) {
     id = newId;
 }
 
-vector<unsigned char> *Image::getCoords() {
+vector<double> *Image::getCoords() {
     return this->coords;
 }
 
-void Image::setCoords(vector<unsigned char> *newCoords) {
+void Image::setCoords(vector<double> *newCoords) {
     coords = newCoords;
 }
 

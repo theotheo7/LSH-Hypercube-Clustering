@@ -11,19 +11,19 @@ class Image {
 private:
 
     uint id;
-    std::vector<unsigned char> *coords;
+    std::vector<double> *coords;
     uint cluster;
 
 public:
 
-    Image(uint, std::vector<unsigned char> *);
+    Image(uint, std::vector<double> *);
     ~Image();
 
     uint getId();
     void setId(uint);
 
-    std::vector<unsigned char> *getCoords();
-    void setCoords(std::vector<unsigned char> *);
+    std::vector<double> *getCoords();
+    void setCoords(std::vector<double> *);
 
     uint getCluster();
     void setCluster(uint);

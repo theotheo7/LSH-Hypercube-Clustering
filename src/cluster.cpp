@@ -2,18 +2,54 @@
 
 using namespace std;
 
-Cluster::Cluster(int k, int tables, int functions, int M, int dim, int probes) {
-    this->k = k;
-    this->tables = tables;
-    this->functions = functions;
-    this->M = M;
-    this->dim = dim;
-    this->probes = probes;
+Cluster::Cluster(uint id, vector<double> *coords) {
+
+    this->id = id;
+    this->centroid = new Image(id, coords);
+    this->images = new vector<Image *>;
+
 }
 
-Cluster::~Cluster() = default;
+Cluster::~Cluster() {
+    delete centroid;
+    delete images;
+}
 
-// K-Means++ initialization algorithm
+uint Cluster::getId() {
+    return this->id;
+}
+
+void Cluster::setId(uint newId) {
+    this->id = newId;
+}
+
+Image *Cluster::getCentroid() {
+    return this->centroid;
+}
+
+void Cluster::setCentroid(Image *newCentroid) {
+    this->centroid = newCentroid;
+}
+
+vector<Image *> *Cluster::getImages() {
+    return this->images;
+}
+
+void Cluster::setImages(std::vector<Image *> *newImages) {
+    this->images = newImages;
+}
+
+void Cluster::assign(void *pointer) {
+    auto image = (Image *) pointer;
+
+    this->images->push_back(image);
+}
+
+void Cluster::clear() {
+    this->images->clear();
+}
+
+/*// K-Means++ initialization algorithm
 void Cluster::kpp(vector<Image*> *images, vector<Image*> *centroids) {
     uint cluster;
     int index;
@@ -78,9 +114,9 @@ void Cluster::kpp(vector<Image*> *images, vector<Image*> *centroids) {
         //images->at(j)->setCluster(nearestCentroid(images->at(j),centroids, k));
     }
 
-}
+}*/
 
-Image *Cluster::selectRandomly(vector<Image *> *images) {
+/*Image *Cluster::selectRandomly(vector<Image *> *images) {
 
     // Seed the random number generator
     std::random_device rd;
@@ -117,8 +153,9 @@ int nearestCentroid(Image* image, vector<Image*> *centroids, int k) {
         }
     }
     return (int) image->getId();
-}
+}*/
 
+/*
 vector<Image*> *lloyd(vector<Image*> *images, int numOfImages, int k, int maxTimes) {
 
     int i, j, index;
@@ -178,4 +215,4 @@ vector<Image*> *lloyd(vector<Image*> *images, int numOfImages, int k, int maxTim
 
   return centroids;
 
-}
+}*/

@@ -1,84 +1,67 @@
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <utility>
 #include <unistd.h>
 #include <cstring>
-#include <time.h>
 
 #include <random>
-#include <iterator>
 
 #include "../include/parser.hpp"
-#include "../include/utils.hpp"
-#include "../include/image.hpp"
-#include "../include/cluster.hpp"
 
 using namespace std;
 
 int main(int argc, char **argv) {
-  srand(time(NULL));
+    int opt;
+    bool complete = false;
+    string method;
 
-  int opt, m, flag = 0;
+    string inputFile, confFile, outputFile;
 
-  int k =3;
-
-  m = 0;
-  char *ifile = nullptr;
-  char *conffile = nullptr;
-  char *ofile = nullptr;
-
-  //ifstream ifs;
-  //string s;
-
-  Cluster cluster;
-
-  while ((opt = getopt(argc, argv, "i:c:o:m:complete")) != -1) {
-    switch(opt) {
-      case 'i':
-        ifile = optarg;
-        break;
-      case 'c':
-        if (strcmp(optarg, "omplete")== 0) {
-          flag = 1;
-        } else {
-          conffile = optarg;
+    while ((opt = getopt(argc, argv, "i:c:o:m:complete")) != -1) {
+        switch(opt) {
+            case 'i':
+                inputFile = optarg;
+                break;
+            case 'c':
+                if (strcmp(optarg, "omplete")== 0) {
+                    complete = true;
+                } else {
+                    confFile = optarg;
+                }
+                break;
+            case 'o':
+                outputFile = optarg;
+                break;
+            case 'm':
+                method = optarg;
+                break;
+            case '?':
+                complete = true;
+                break;
+            default:
+                abort();
         }
-        break;
-      case 'o':
-        ofile = optarg;
-        break;
-      case 'm':
-        m = stoi(optarg);
-        break;
-      case '?':
-        flag = 1;
-        break;
-      default:
-        abort();
     }
-  }
 
-    Parser *parser = new Parser();
+    auto parser = new Parser();
     vector<Image *> *inputImages = parser->readInputFile("resources/input.dat");
     //parser for cluster conf
-
-
-    int numOfPoints = points->size();
+    Clustering *clustering = parser->readClusterConf(confFile);
 
     //kpp first
-    
+    clustering->initialize(inputImages);
 
-    vector<Point> *centroids = lloyd(points, numOfPoints, k, 10);
-
-    //FINISH LSH 
-    //FINISH CUBE 
+    //FINISH LSH
+    //FINISH CUBE
     //FINISH SILHOUETTE
 
-    printResults(points, centroids, ofile, 3);
+    delete parser;
+    delete clustering;
 
-    delete centroids;
-    delete points;
+    for (auto image : *inputImages) {
+        delete image;
+    }
+
+    delete inputImages;
 
     return 0;
 }

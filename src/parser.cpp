@@ -43,7 +43,12 @@ vector<Image *> *Parser::readInputFile(const string &fileName) {
 
         ifs.read(reinterpret_cast<char *>(inputVector.data()), imageSize);
 
-        auto coords = new vector<unsigned char>(inputVector);
+        auto coords = new vector<double>;
+        for (auto uc : inputVector) {
+            double d = static_cast<double>(uc);
+            coords->push_back(d);
+        }
+
         imageVector->push_back(new Image(i+1, coords));
     }
 
@@ -82,7 +87,11 @@ vector<Image *> *Parser::readQueryFile(const string &fileName) {
     for (int i = 0; i < 10; i++) {
         ifs.read(reinterpret_cast<char *>(inputVector.data()), imageSize);
 
-        auto coords = new vector<unsigned char>(inputVector);
+        auto coords = new vector<double>;
+        for (auto uc : inputVector) {
+            double d = static_cast<double>(uc);
+            coords->push_back(d);
+        }
         queryImages->push_back(new Image(i+1, coords));
     }
 
@@ -90,8 +99,8 @@ vector<Image *> *Parser::readQueryFile(const string &fileName) {
     return queryImages;
 }
 
-Cluster *Parser::readClusterConf(const string &fileName) {
-    int clusters;
+Clustering *Parser::readClusterConf(const string &fileName) {
+    int clusters = 3;
     int L = 3;
     int kLSH = 4;
     int M = 10;
@@ -105,27 +114,27 @@ Cluster *Parser::readClusterConf(const string &fileName) {
         return nullptr;
     }
 
-    string line;
+    /*string line;
     while (getline(ifs, line)) {
         istringstream iss(line);
         string key;
 
-        if (key == "number_of_clusters:") {
+        if (key == "number_of_clusters: ") {
             iss >> clusters;
-        } else if (key == "number_of_vector_hash_tables:") {
+        } else if (key == "number_of_vector_hash_tables: ") {
             iss >> L;
-        } else if (key == "number_of_vector_hash_functions:") {
+        } else if (key == "number_of_vector_hash_functions: ") {
             iss >> kLSH;
-        } else if (key == "max_number_M_hypercube:") {
+        } else if (key == "max_number_M_hypercube: ") {
             iss >> M;
-        } else if (key == "number_of_hypercube_dimensions:") {
+        } else if (key == "number_of_hypercube_dimensions: ") {
             iss >> kCube;
-        } else if (key == "number_of_probes:") {
+        } else if (key == "number_of_probes: ") {
             iss >> probes;
         }
-    }
+    }*/
 
     ifs.close();
 
-    return new Cluster(clusters, L, kLSH, M, kCube, probes);
+    return new Clustering(clusters, L, kLSH, M, kCube, probes);
 }

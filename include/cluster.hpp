@@ -2,39 +2,37 @@
 #define CLUSTER_HPP
 
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <utility>
-#include <unistd.h>
-#include <cstring>
-#include <ctime>
 #include <vector>
-#include <algorithm>
 
-#include <random>
-#include <iterator>
+#include "./image.hpp"
 
-#include "../include/parser.hpp"
-#include "../include/utils.hpp"
-#include "../include/image.hpp"
+class Image;
 
 class Cluster {
 private:
 
-    int k;
-    int tables;
-    int functions;
-    int M;
-    int dim;
-    int probes;
+    uint id;
+
+    Image *centroid;
+
+    std::vector<Image *> *images;
 
 public:
-    Cluster(int, int, int, int, int, int);
+    Cluster(uint, std::vector<double> *);
     ~Cluster();
 
-    void kpp(std::vector<Image*> *, std::vector<Image*> *);
+    uint getId();
+    void setId(uint);
 
-    Image *selectRandomly(std::vector<Image *> *);
+    Image *getCentroid();
+    void setCentroid(Image *);
+
+    std::vector<Image *> *getImages();
+    void setImages(std::vector<Image *> *);
+
+    void assign(void *);
+    void clear();
+
 };
 
 #endif
