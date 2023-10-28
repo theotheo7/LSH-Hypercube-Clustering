@@ -260,10 +260,10 @@ double averageDistanceToNeighborCluster(Image* image, const std::vector<Cluster*
 
 std::vector<double> Clustering::silhouette(std::vector<Image *> *images) {
     std::vector<double> s;
-
+    double averageClusterSilhouette = 0.0;
     for (auto cluster : *clusters) {
         const std::vector<Image*> *clusterImages = cluster->getImages();
-        std::cout << "Cluster Num: " << cluster->getId() << std::endl;
+        //std::cout << "Cluster Num: " << cluster->getId() << std::endl;
 
         for (auto image : *clusterImages) {
             double ai = averageDistanceToCluster(image, clusters);
@@ -276,18 +276,22 @@ std::vector<double> Clustering::silhouette(std::vector<Image *> *images) {
                 //std::cout << "Image ID: " << image->getId() << std::endl;
                 //std::cout << "Silhouette: " << si << std::endl;
                 s.push_back(si);
+                averageClusterSilhouette += si;
             }
         }
-        
-        // Print the average Silhouette for the cluster
-        if (!s.empty()) {
-            double averageClusterSilhouette = std::accumulate(s.begin(), s.end(), 0.0) / s.size();
-            std::cout << "Average Silhouette for Cluster (stotal) " << cluster->getId() << ": " << averageClusterSilhouette << std::endl;
-        }
-        
-        s.clear(); // Clear the vector for the next cluster
     }
-
+    cout << "Silhouette: [";
+    for (unsigned int i = 0; i < clusters->size(); i++) {
+        double average = 0.0;
+        std::vector<Image*> *clusterPoints = clusters->at(i)->getImages();
+        for (unsigned int j = 0; j < clusterPoints->size(); j++) {
+                average += s[clusterPoints->at(j)->getId()];
+        }
+        cout << average/clusterPoints->size() << ","; // Print average Silhouette value for each cluster
+    }
+    averageClusterSilhouette /= images->size();
+    cout << " " << averageClusterSilhouette << "]\n";     // Print average silhouette value for whole dataset
+    //I should clear the s here maybe
     return s; // Returning an empty vector since all values are printed for now,I will change it
 }
 
