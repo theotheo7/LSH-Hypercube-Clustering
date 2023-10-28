@@ -136,11 +136,11 @@ void Clustering::lloyds(std::vector<Image *> *images, int maxTimes) {
                 if (image->getCluster() != 0) {
                     clusters->at(image->getCluster() - 1)->removeImage(image);
                     updateMacQueenRemoval(clusters->at(image->getCluster() - 1));
-                }
-
-                temp->assign(image);
-                updateMacQueenInsert(temp);
             }
+
+            temp->assign(image);
+            updateMacQueenInsert(temp);
+}
 
         }
 
@@ -200,3 +200,96 @@ uint Clustering::findNearestCentroid(Image *image) {
 
     return centroid;
 }*/
+
+double averageDistanceToCluster(Image* image, std::vector<Cluster *> *clusters) {
+    double totalDistance = 0.0;
+    int numImagesInCluster = 0;
+
+    for (auto cluster : *clusters) {
+        vector<Image*> *imageInCluster = cluster->getImages();
+        for (auto clusterImage : *imageInCluster) {
+            double distance = dist(image, clusterImage, 2); 
+            totalDistance += distance;
+            numImagesInCluster++;
+        }
+    }
+
+    if (numImagesInCluster > 0) {
+        return totalDistance / numImagesInCluster;
+    }
+
+    return 0.0; // Avoid division by zero if the clusters are empty
+}
+
+double averageDistanceToNeighborCluster(Image* image, const std::vector<Cluster*>* clusters/*, unsigned int imageIndex*/) {
+    unsigned int clusterIndex = image->getCluster();
+
+    double minDistance = std::numeric_limits<double>::max(); // Initialize with a large value
+    Cluster* neighborCluster = nullptr;
+
+    for (unsigned int j = 0; j < clusters->size(); j++) {
+        if (j != clusterIndex) { // Exclude the cluster the image belongs to
+            double distance = dist(image, clusters->at(j)->getCentroid(), 2); 
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                neighborCluster = clusters->at(j);
+            }
+        }
+    }
+
+    if (neighborCluster) {
+        double totalDistance = 0.0;
+        const std::vector<Image*>* neighborClusterImages = neighborCluster->getImages();
+
+        for (auto neighborImage : *neighborClusterImages) {
+            double distance = dist(image, neighborImage, 2); // Calculate distance between the image and images in the neighbor cluster
+            totalDistance += distance;
+        }
+
+        int neighborClusterSize = neighborClusterImages->size();
+
+        if (neighborClusterSize > 0) {
+            double averageDistance = totalDistance / neighborClusterSize;
+            return averageDistance;
+        }
+    }
+
+    return 0.0; // No images in the neighbor cluster (or only itself), return 0
+}
+
+std::vector<double> Clustering::silhouette(std::vector<Image *> *images) {
+    std::vector<double> s;
+
+    for (auto cluster : *clusters) {
+        const std::vector<Image*> *clusterImages = cluster->getImages();
+        std::cout << "Cluster Num: " << cluster->getId() << std::endl;
+
+        for (auto image : *clusterImages) {
+            double ai = averageDistanceToCluster(image, clusters);
+            double bi = averageDistanceToNeighborCluster(image, clusters);
+
+            if (std::max(ai, bi) == 0) {
+                s.push_back(0.0);
+            } else {
+                double si = (bi - ai) / std::max(ai, bi);
+                //std::cout << "Image ID: " << image->getId() << std::endl;
+                //std::cout << "Silhouette: " << si << std::endl;
+                s.push_back(si);
+            }
+        }
+        
+        // Print the average Silhouette for the cluster
+        if (!s.empty()) {
+            double averageClusterSilhouette = std::accumulate(s.begin(), s.end(), 0.0) / s.size();
+            std::cout << "Average Silhouette for Cluster (stotal) " << cluster->getId() << ": " << averageClusterSilhouette << std::endl;
+        }
+        
+        s.clear(); // Clear the vector for the next cluster
+    }
+
+    return s; // Returning an empty vector since all values are printed for now,I will change it
+}
+
+
+

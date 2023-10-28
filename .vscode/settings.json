@@ -50,6 +50,10 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "typeinfo": "cpp",
-        "cstdarg": "cpp"
+        "cstdarg": "cpp",
+        "chrono": "cpp",
+        "set": "cpp",
+        "ratio": "cpp",
+        "sstream": "cpp"
     }
 }

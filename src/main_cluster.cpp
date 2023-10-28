@@ -45,7 +45,9 @@ int main(int argc, char **argv) {
     auto parser = new Parser();
     vector<Image *> *inputImages = parser->readInputFile("resources/input.dat");
     //parser for cluster conf
-    Clustering *clustering = parser->readClusterConf(confFile);
+    //Clustering *clustering = parser->readClusterConf(confFile);
+    Clustering *clustering = parser->readClusterConf("resources/cluster.conf"); //DIMITRIS: just to test the Silhouette,
+                                                                                //          you can delete it
 
     //kpp first
     clustering->initialize(inputImages);
@@ -54,6 +56,7 @@ int main(int argc, char **argv) {
     //FINISH LSH
     //FINISH CUBE
     //FINISH SILHOUETTE
+    clustering->silhouette(inputImages); //silhouette
 
     delete parser;
     delete clustering;

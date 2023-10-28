@@ -38,6 +38,8 @@ public:
     void updateMacQueenRemoval(Cluster *);
     uint findNearestCentroid(Image *);
 
+    std::vector<double> silhouette(std::vector<Image *> *);
+
 };
 
 #endif
