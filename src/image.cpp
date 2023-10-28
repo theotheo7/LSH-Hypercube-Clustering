@@ -4,9 +4,10 @@
 
 using namespace std;
 
-Image::Image(uint newId, vector<double> *coords) {
+Image::Image(uint newId, vector<double> *coords, uint cluster) {
     this->id = newId;
     this->coords = coords;
+    this->cluster = cluster;
 }
 
 Image::~Image() {
@@ -37,3 +38,6 @@ void Image::setCluster(uint newCluster) {
     cluster = newCluster;
 }
 
+void Image::clear() {
+    this->coords->clear();
+}

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 
 #include "utils.hpp"
 
@@ -16,7 +17,7 @@ private:
 
 public:
 
-    Image(uint, std::vector<double> *);
+    Image(uint, std::vector<double> *, uint);
     ~Image();
 
     uint getId();
@@ -27,6 +28,8 @@ public:
 
     uint getCluster();
     void setCluster(uint);
+
+    void clear();
 
 };
 

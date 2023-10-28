@@ -19,6 +19,21 @@ double dist(void *a, void *b, int k) {
     return sqrt(dist);
 }
 
+double distCoords(vector<double> *a, vector<double> *b) {
+
+    if (a->size() != b->size()) {
+        return -1;
+    }
+
+    double dist = 0.0;
+    for (size_t i = 0; i < a->size(); i++) {
+        double diff = a->at(i) - b->at(i);
+        dist += diff * diff;
+    }
+
+    return sqrt(dist);
+}
+
 int euclideanModulo(int a, int b) {
     int mod = a%b;
     if (mod < 0) {

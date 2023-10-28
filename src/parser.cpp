@@ -49,7 +49,7 @@ vector<Image *> *Parser::readInputFile(const string &fileName) {
             coords->push_back(d);
         }
 
-        imageVector->push_back(new Image(i+1, coords));
+        imageVector->push_back(new Image(i+1, coords, 0));
     }
 
     cout << "Finished reading images!" << endl;
@@ -92,7 +92,7 @@ vector<Image *> *Parser::readQueryFile(const string &fileName) {
             double d = static_cast<double>(uc);
             coords->push_back(d);
         }
-        queryImages->push_back(new Image(i+1, coords));
+        queryImages->push_back(new Image(i+1, coords, 0));
     }
 
     ifs.close();

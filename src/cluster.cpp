@@ -5,7 +5,7 @@ using namespace std;
 Cluster::Cluster(uint id, vector<double> *coords) {
 
     this->id = id;
-    this->centroid = new Image(id, coords);
+    this->centroid = coords;
     this->images = new vector<Image *>;
 
 }
@@ -23,11 +23,11 @@ void Cluster::setId(uint newId) {
     this->id = newId;
 }
 
-Image *Cluster::getCentroid() {
+vector<double> *Cluster::getCentroid() {
     return this->centroid;
 }
 
-void Cluster::setCentroid(Image *newCentroid) {
+void Cluster::setCentroid(vector<double> *newCentroid) {
     this->centroid = newCentroid;
 }
 
@@ -43,10 +43,15 @@ void Cluster::assign(void *pointer) {
     auto image = (Image *) pointer;
 
     this->images->push_back(image);
+    image->setCluster(this->id);
 }
 
-void Cluster::clear() {
+void Cluster::clearImages() {
     this->images->clear();
+}
+
+void Cluster::clearCentroid() {
+    this->centroid->clear();
 }
 
 /*// K-Means++ initialization algorithm

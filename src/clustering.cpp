@@ -37,8 +37,6 @@ void Clustering::initialize(vector<Image *> *images) {
     for (int i = 1; i < clusterNum; i++) {
         int numOfImages = (int) available.size();
 
-        cout << "NUMBER OF IMAGES: " << numOfImages << endl;
-
         // Initialize min distance of each image to closest centroid
         // as a "max" distance
         for (int j = 0; j < numOfImages; j++) {
@@ -50,7 +48,7 @@ void Clustering::initialize(vector<Image *> *images) {
 
             for (auto cluster: *clusters) {
 
-                distance = dist(cluster->getCentroid(), available.at(j), 2);
+                distance = distCoords(cluster->getCentroid(), available.at(j)->getCoords());
                 if (distance < minDist.at(j)) {
                     minDist.at(j) = distance;
                 }
@@ -104,8 +102,6 @@ Cluster *Clustering::selectRandomly(vector<Image *> *images) {
     // Generate a random index
     size_t randomIndex = dist(gen);
 
-    cout << "Random index is: " << randomIndex << endl;
-
     Image *image = images->at(randomIndex);
     images->erase(images->begin() + randomIndex);
 
@@ -113,3 +109,73 @@ Cluster *Clustering::selectRandomly(vector<Image *> *images) {
     return new Cluster(1, new vector<double>(*image->getCoords()));
 
 }
+
+void Clustering::lloyds(std::vector<Image *> *images, int maxTimes) {
+    int changes;
+    int numOfImages = (int) images->size();
+    int acceptable = numOfImages / 500;
+    double distance;
+
+    do {
+        changes = 0;
+
+        Cluster *temp;
+        for (auto image : *images) {
+            double min = 1000000;
+            for (auto cluster : *clusters) {
+                distance = distCoords(image->getCoords(), cluster->getCentroid());
+                if (distance < min) {
+                    min = distance;
+                    temp = cluster;
+                }
+            }
+
+            if (image->getCluster() != temp->getId()) {
+                changes++;
+            }
+
+            temp->assign(image);
+            updateMacQueen(temp);
+
+        }
+
+        maxTimes--;
+
+    } while (maxTimes > 0 && changes > acceptable);
+
+    for (auto cluster : *clusters) {
+        cout << "Size of cluster c" << cluster->getId() << " after lloyds is: " << cluster->getImages()->size() << endl;
+    }
+
+}
+
+void Clustering::updateMacQueen(Cluster *cluster) {
+    int sizeOfCoords = cluster->getCentroid()->size();
+
+    auto coords = cluster->getCentroid();
+    int imageNum = cluster->getImages()->size();
+
+    for (int i = 0; i < sizeOfCoords; i++) {
+        double newImageCoord = cluster->getImages()->back()->getCoords()->at(i);
+        coords->at(i) = (coords->at(i) * (imageNum - 1) + newImageCoord) / imageNum;
+    }
+
+}
+
+/*
+uint Clustering::findNearestCentroid(Image *image) {
+    double min = 10000000;
+    double distance;
+
+    uint centroid = 0;
+
+    for (auto cluster : *clusters) {
+        distance = dist(image, cluster->getCentroid(), 2);
+        if (distance < min) {
+            min = distance;
+            centroid = cluster->getId() - 1;
+        }
+    }
+
+    return centroid;
+}*/

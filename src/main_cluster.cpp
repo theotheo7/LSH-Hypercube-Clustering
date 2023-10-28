@@ -49,6 +49,7 @@ int main(int argc, char **argv) {
 
     //kpp first
     clustering->initialize(inputImages);
+    clustering->lloyds(inputImages, 10);
 
     //FINISH LSH
     //FINISH CUBE

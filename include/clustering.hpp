@@ -32,6 +32,11 @@ public:
     void initialize(std::vector<Image *> *);
     Cluster *selectRandomly(std::vector<Image *> *);
 
+    void lloyds(std::vector<Image *> *, int);
+
+    void updateMacQueen(Cluster *);
+    uint findNearestCentroid(Image *);
+
 };
 
 #endif

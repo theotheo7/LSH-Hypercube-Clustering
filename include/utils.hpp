@@ -12,6 +12,7 @@
 #include "image.hpp"
 
 double dist(void *, void *, int);
+double distCoords(std::vector<double> *, std::vector<double> *);
 
 int euclideanModulo(int, int);
 

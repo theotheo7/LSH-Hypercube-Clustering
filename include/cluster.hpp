@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 
 #include "./image.hpp"
 
@@ -13,7 +14,7 @@ private:
 
     uint id;
 
-    Image *centroid;
+    std::vector<double> *centroid;
 
     std::vector<Image *> *images;
 
@@ -24,14 +25,15 @@ public:
     uint getId();
     void setId(uint);
 
-    Image *getCentroid();
-    void setCentroid(Image *);
+    std::vector<double> *getCentroid();
+    void setCentroid(std::vector<double> *);
 
     std::vector<Image *> *getImages();
     void setImages(std::vector<Image *> *);
 
     void assign(void *);
-    void clear();
+    void clearImages();
+    void clearCentroid();
 
 };
 
