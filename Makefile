@@ -76,10 +76,10 @@ clean:
 	rm -f $(OBJS_LSH) $(OBJS_CUBE) $(LSH) $(CUBE)
 
 lsh: $(LSH)
-	./$(LSH)
+	./$(LSH) -d resources/input.dat -q resources/query.dat -o resources/outputLSH.txt
 
 cube: $(CUBE)
-	./$(CUBE)
+	./$(CUBE) -d resources/input.dat -q resources/query.dat -o resources/outputCube.txt
 
 cluster: $(CLUSTER)
 	./$(CLUSTER)
