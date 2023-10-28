@@ -54,6 +54,15 @@ void Cluster::clearCentroid() {
     this->centroid->clear();
 }
 
+void Cluster::removeImage(Image *image) {
+    for (int i = 0; i < (int) images->size(); i++) {
+        if (images->at(i)->getId() == image->getId()) {
+            images->erase(images->begin() + i);
+            break;
+        }
+    }
+}
+
 /*// K-Means++ initialization algorithm
 void Cluster::kpp(vector<Image*> *images, vector<Image*> *centroids) {
     uint cluster;

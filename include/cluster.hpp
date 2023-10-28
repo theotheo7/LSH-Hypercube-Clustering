@@ -35,6 +35,8 @@ public:
     void clearImages();
     void clearCentroid();
 
+    void removeImage(Image *);
+
 };
 
 #endif

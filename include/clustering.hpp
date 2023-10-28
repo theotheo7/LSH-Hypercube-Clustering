@@ -34,7 +34,8 @@ public:
 
     void lloyds(std::vector<Image *> *, int);
 
-    void updateMacQueen(Cluster *);
+    void updateMacQueenInsert(Cluster *);
+    void updateMacQueenRemoval(Cluster *);
     uint findNearestCentroid(Image *);
 
 };

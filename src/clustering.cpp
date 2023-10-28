@@ -113,10 +113,11 @@ Cluster *Clustering::selectRandomly(vector<Image *> *images) {
 void Clustering::lloyds(std::vector<Image *> *images, int maxTimes) {
     int changes;
     int numOfImages = (int) images->size();
-    int acceptable = numOfImages / 500;
+    int acceptable = numOfImages / 100;
     double distance;
 
     do {
+        cout << "Running.." << endl;
         changes = 0;
 
         Cluster *temp;
@@ -132,10 +133,14 @@ void Clustering::lloyds(std::vector<Image *> *images, int maxTimes) {
 
             if (image->getCluster() != temp->getId()) {
                 changes++;
-            }
+                if (image->getCluster() != 0) {
+                    clusters->at(image->getCluster() - 1)->removeImage(image);
+                    updateMacQueenRemoval(clusters->at(image->getCluster() - 1));
+                }
 
-            temp->assign(image);
-            updateMacQueen(temp);
+                temp->assign(image);
+                updateMacQueenInsert(temp);
+            }
 
         }
 
@@ -149,7 +154,7 @@ void Clustering::lloyds(std::vector<Image *> *images, int maxTimes) {
 
 }
 
-void Clustering::updateMacQueen(Cluster *cluster) {
+void Clustering::updateMacQueenInsert(Cluster *cluster) {
     int sizeOfCoords = cluster->getCentroid()->size();
 
     auto coords = cluster->getCentroid();
@@ -158,6 +163,22 @@ void Clustering::updateMacQueen(Cluster *cluster) {
     for (int i = 0; i < sizeOfCoords; i++) {
         double newImageCoord = cluster->getImages()->back()->getCoords()->at(i);
         coords->at(i) = (coords->at(i) * (imageNum - 1) + newImageCoord) / imageNum;
+    }
+
+}
+
+void Clustering::updateMacQueenRemoval(Cluster *cluster) {
+    int sizeOfCoords = cluster->getCentroid()->size();
+
+    auto coords = cluster->getCentroid();
+    int imageNum = cluster->getImages()->size();
+
+    for (int i = 0; i < sizeOfCoords; i++) {
+        double total = 0;
+        for (int j = 0; j < imageNum; j++) {
+            total += cluster->getImages()->at(j)->getCoords()->at(i);
+        }
+        coords->at(i) = total / imageNum;
     }
 
 }
