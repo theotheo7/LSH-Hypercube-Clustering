@@ -2,6 +2,8 @@
 #include <string>
 #include <unistd.h>
 #include <cstring>
+#include <chrono>
+#include <algorithm>
 
 #include <random>
 
@@ -13,6 +15,8 @@ int main(int argc, char **argv) {
     int opt;
     bool complete = false;
     string method = "Classic";
+
+    chrono::duration<double> tCluster{};
 
     string inputFile, confFile, outputFile;
 
@@ -59,6 +63,7 @@ int main(int argc, char **argv) {
     vector<Image *> *inputImages = parser->readInputFile(inputFile);
     Clustering *clustering = parser->readClusterConf(confFile, outputFile);
 
+    auto startTime = chrono::high_resolution_clock::now();
     // Initialize using kpp
     clustering->initialize(inputImages);
 
@@ -71,10 +76,14 @@ int main(int argc, char **argv) {
         clustering->lloyds(inputImages, 20);
     }
 
+    auto endTime = chrono::high_resolution_clock::now();
+
+    tCluster = endTime - startTime;
+
     // Calculate the silhouette
     clustering->silhouette(inputImages); //silhouette
 
-    clustering->outputResults(complete, method);
+    clustering->outputResults(complete, method, tCluster.count());
 
     delete parser;
     delete clustering;

@@ -353,7 +353,7 @@ double averageDistanceToNeighborCluster(Image* image, const std::vector<Cluster*
 
     for (unsigned int j = 0; j < clusters->size(); j++) {
         if (j != clusterIndex) { // Exclude the cluster the image belongs to
-            double distance = dist(image, clusters->at(j)->getCentroid(), 2); 
+            double distance = distCoords(image->getCoords(), clusters->at(j)->getCentroid());
 
             if (distance < minDistance) {
                 minDistance = distance;
@@ -414,7 +414,7 @@ void Clustering::silhouette(std::vector<Image *> *images) {
     silhouetteAvg->push_back(averageClusterSilhouette); // add average silhouette value for whole dataset
 }
 
-void Clustering::outputResults(bool complete, const string& method) {
+void Clustering::outputResults(bool complete, const string& method, double time) {
     string contents;
 
     if (output.is_open()) {
@@ -433,6 +433,8 @@ void Clustering::outputResults(bool complete, const string& method) {
             }
             contents.append(" ]\n");
         }
+
+        contents.append("clustering_time: " + to_string(time) + "\n");
 
         contents.append("Silhouette: [");
         for (auto sil : *silhouetteAvg) {
@@ -459,4 +461,3 @@ void Clustering::outputResults(bool complete, const string& method) {
     contents.append("\n");
     output << contents;
 }
-

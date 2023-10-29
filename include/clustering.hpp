@@ -49,8 +49,7 @@ public:
 
     void silhouette(std::vector<Image *> *);
 
-    void outputResults(bool, const std::string&);
-
+    void outputResults(bool, const std::string&, double);
 };
 
 #endif
