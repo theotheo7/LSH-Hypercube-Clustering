@@ -82,4 +82,10 @@ cube: $(CUBE)
 	./$(CUBE) -d resources/input.dat -q resources/query.dat -o resources/outputCube.txt
 
 cluster: $(CLUSTER)
-	./$(CLUSTER)
+	./$(CLUSTER) -i resources/input.dat -o resources/outputCluster.txt
+
+clusterLSH: $(CLUSTER)
+	./$(CLUSTER) -i resources/input.dat -o resources/outputCluster.txt -m LSH
+
+clusterCube: $(CLUSTER)
+	./$(CLUSTER) -i resources/input.dat -o resources/outputCluster.txt -m Hypercube

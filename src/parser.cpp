@@ -39,13 +39,13 @@ vector<Image *> *Parser::readInputFile(const string &fileName) {
     const uint32_t imageSize = rowNumber * columnNumber;
     vector<unsigned char> inputVector(imageSize);
 
-    for (uint i = 0; i < imageNumber; i++) {
+    for (uint i = 0; i < 1000; i++) {
 
         ifs.read(reinterpret_cast<char *>(inputVector.data()), imageSize);
 
         auto coords = new vector<double>;
         for (auto uc : inputVector) {
-            double d = static_cast<double>(uc);
+            auto d = static_cast<double>(uc);
             coords->push_back(d);
         }
 
@@ -89,7 +89,7 @@ vector<Image *> *Parser::readQueryFile(const string &fileName) {
 
         auto coords = new vector<double>;
         for (auto uc : inputVector) {
-            double d = static_cast<double>(uc);
+            auto d = static_cast<double>(uc);
             coords->push_back(d);
         }
         queryImages->push_back(new Image(i+1, coords, 0));
