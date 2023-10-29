@@ -5,7 +5,7 @@ using namespace std;
 const int M = (int)pow(2, 32) - 5;
 
 // Constructor for the LSH (Locality Sensitive Hashing) class
-LSH::LSH(int k, int L,int N, int R, vector<Image *> *data, string outputFile) {
+LSH::LSH(int k, int L,int N, int R, vector<Image *> *data, const string& outputFile) {
     
     // Initialize the given parameters
     this->k = k;
@@ -141,21 +141,13 @@ void LSH::query(Image* q) {
 }
 
 std::vector<double> LSH::getTrueNeighbors(Image *image) {
-    priority_queue<double, vector<double>, less<>> pqTrue;
-
-    for (auto it : *this->data) {
-        pqTrue.push(dist(it, image, 2));
-        if (pqTrue.size() > (size_t) N) {
-            pqTrue.pop();
-        }
-    }
-
     vector<double> neighborsTrue;
 
-    while (!pqTrue.empty()) {
-        neighborsTrue.push_back(pqTrue.top());
-        pqTrue.pop();
+    for (auto it : *this->data) {
+        neighborsTrue.push_back(dist(it, image, 2));
     }
+
+    sort(neighborsTrue.begin(), neighborsTrue.end());
 
     return neighborsTrue;
 }

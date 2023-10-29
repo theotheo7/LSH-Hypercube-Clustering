@@ -26,7 +26,7 @@ private:
 
 public:
     // Constructor
-    LSH(int k, int L, int N, int R, std::vector<Image *> *data, std::string);
+    LSH(int k, int L, int N, int R, std::vector<Image *> *data, const std::string&);
     LSH(int k, int L, int R, std::vector<Image *> *data);
 
     void insert(Image *);

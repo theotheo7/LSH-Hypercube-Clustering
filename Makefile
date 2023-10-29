@@ -85,7 +85,7 @@ cluster: $(CLUSTER)
 	./$(CLUSTER) -i resources/input.dat -o resources/outputCluster.txt
 
 clusterLSH: $(CLUSTER)
-	./$(CLUSTER) -i resources/input.dat -o resources/outputCluster.txt -m LSH
+	./$(CLUSTER) -i resources/input.dat -o resources/outputCluster.txt -complete -m Classic
 
 clusterCube: $(CLUSTER)
 	./$(CLUSTER) -i resources/input.dat -o resources/outputCluster.txt -m Hypercube
