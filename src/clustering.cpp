@@ -113,7 +113,7 @@ Cluster *Clustering::selectRandomly(vector<Image *> *images) {
 void Clustering::lloyds(std::vector<Image *> *images, int maxTimes) {
     int changes;
     int numOfImages = (int) images->size();
-    int acceptable = numOfImages / 100;
+    int acceptable = numOfImages / 500;
     double distance;
 
     do {
@@ -122,25 +122,18 @@ void Clustering::lloyds(std::vector<Image *> *images, int maxTimes) {
 
         Cluster *temp;
         for (auto image : *images) {
-            double min = 1000000;
-            for (auto cluster : *clusters) {
-                distance = distCoords(image->getCoords(), cluster->getCentroid());
-                if (distance < min) {
-                    min = distance;
-                    temp = cluster;
-                }
-            }
+            temp = getClosestCentroid(image);
 
             if (image->getCluster() != temp->getId()) {
                 changes++;
                 if (image->getCluster() != 0) {
                     clusters->at(image->getCluster() - 1)->removeImage(image);
-                    updateMacQueenRemoval(clusters->at(image->getCluster() - 1));
-            }
+                    updateMacQueen(clusters->at(image->getCluster() - 1));
+                }
 
-            temp->assign(image);
-            updateMacQueenInsert(temp);
-}
+                temp->assign(image);
+                updateMacQueenInsert(temp);
+            }
 
         }
 
@@ -149,11 +142,79 @@ void Clustering::lloyds(std::vector<Image *> *images, int maxTimes) {
     } while (maxTimes > 0 && changes > acceptable);
 
     for (auto cluster : *clusters) {
-        cout << "Size of cluster c" << cluster->getId() << " after lloyds is: " << cluster->getImages()->size() << endl;
+        cout << "CLUSTER-" << cluster->getId() << " {" << cluster->getImages()->size() << "}" << endl;
+        for (auto coord : *cluster->getCentroid()) {
+            cout << coord << " ";
+        }
+        cout << endl;
     }
 
 }
 
+void Clustering::reverseLSH(std::vector<Image *> *images) {
+    int R = minDistanceOfCentroids();
+    cout << "Starting R: " << R << endl;
+    int RMax = 100000;
+
+    vector<Image *> *neighbors;
+
+    auto lsh = new LSH(kLSH, L, R, images);
+
+    do {
+        cout << "Running.." << endl;
+        for (auto cluster : *clusters) {
+            neighbors = lsh->reverseSearch(cluster->getCentroid(), R);
+
+            if (neighbors->empty()) {
+                continue;
+            }
+
+            for (auto neighbor : *neighbors) {
+                // If it has already been assigned skip it
+                if (neighbor->getAssigned()) {
+                    continue;
+                }
+
+                // If image is not in cluster assign it
+                if (neighbor->getCluster() == 0) {
+                    cluster->assign(neighbor);
+                } else if (neighbor->getCluster() != 0 && !neighbor->getAssigned()) { // Image was assigned this iteration but there is conflict
+                    clusters->at(neighbor->getCluster() - 1)->removeImage(neighbor);
+                    getClosestCentroid(neighbor)->assign(neighbor);
+                }
+            }
+
+            delete neighbors;
+        }
+
+        for (auto cluster : *clusters) {
+            cluster->markAllAssigned();
+            updateMacQueen(cluster);
+        }
+
+        R *= 2;
+
+    } while (R < RMax);
+
+    // Assign remaining unassigned images
+    for (auto image : *images) {
+        if (image->getCluster() == 0) {
+            getClosestCentroid(image)->assign(image);
+        }
+    }
+
+    for (auto cluster : *clusters) {
+        cout << "CLUSTER-" << cluster->getId() << " {" << cluster->getImages()->size() << "}" << endl;
+        for (auto coord : *cluster->getCentroid()) {
+            cout << coord << " ";
+        }
+        cout << endl;
+    }
+
+    delete lsh;
+}
+
+// Function to update centroid when a single image gets assigned to its cluster
 void Clustering::updateMacQueenInsert(Cluster *cluster) {
     int sizeOfCoords = cluster->getCentroid()->size();
 
@@ -167,7 +228,8 @@ void Clustering::updateMacQueenInsert(Cluster *cluster) {
 
 }
 
-void Clustering::updateMacQueenRemoval(Cluster *cluster) {
+// Slower function to update centroid regardless of insertion or removal of image
+void Clustering::updateMacQueen(Cluster *cluster) {
     int sizeOfCoords = cluster->getCentroid()->size();
 
     auto coords = cluster->getCentroid();
@@ -183,23 +245,44 @@ void Clustering::updateMacQueenRemoval(Cluster *cluster) {
 
 }
 
-/*
-uint Clustering::findNearestCentroid(Image *image) {
-    double min = 10000000;
+double Clustering::minDistanceOfCentroids() {
+    double minDist = 10000000;
     double distance;
 
-    uint centroid = 0;
+    for (int i = 0; i < clusterNum; i++) {
+        for (int j = 0; j < clusterNum; j++) {
+            // Dont check same centroids
+            if (i != j) {
+                cout << "Calculating distance!!" << endl;
+                distance = distCoords(clusters->at(i)->getCentroid(), clusters->at(j)->getCentroid());
+                cout << "Distance is: " << distance << endl;
 
-    for (auto cluster : *clusters) {
-        distance = dist(image, cluster->getCentroid(), 2);
-        if (distance < min) {
-            min = distance;
-            centroid = cluster->getId() - 1;
+                if (distance < minDist) {
+                    cout << "CHANGING MIN DIST" << endl;
+                    minDist = distance;
+                }
+            }
         }
     }
 
-    return centroid;
-}*/
+    return minDist;
+}
+
+Cluster *Clustering::getClosestCentroid(Image *image) {
+    double distance;
+    double min = 1000000;
+    Cluster *temp;
+
+    for (auto cluster : *clusters) {
+        distance = distCoords(image->getCoords(), cluster->getCentroid());
+        if (distance < min) {
+            min = distance;
+            temp = cluster;
+        }
+    }
+
+    return temp;
+}
 
 double averageDistanceToCluster(Image* image, std::vector<Cluster *> *clusters) {
     double totalDistance = 0.0;

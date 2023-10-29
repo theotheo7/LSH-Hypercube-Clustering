@@ -5,10 +5,12 @@
 #include <vector>
 #include <random>
 #include <algorithm>
+#include <iomanip>
 
 #include "cluster.hpp"
 #include "image.hpp"
 #include "utils.hpp"
+#include "lsh.hpp"
 
 class Cluster;
 
@@ -33,10 +35,12 @@ public:
     Cluster *selectRandomly(std::vector<Image *> *);
 
     void lloyds(std::vector<Image *> *, int);
+    void reverseLSH(std::vector<Image *> *);
 
     void updateMacQueenInsert(Cluster *);
-    void updateMacQueenRemoval(Cluster *);
-    uint findNearestCentroid(Image *);
+    void updateMacQueen(Cluster *);
+    double minDistanceOfCentroids();
+    Cluster *getClosestCentroid(Image *);
 
     std::vector<double> silhouette(std::vector<Image *> *);
 

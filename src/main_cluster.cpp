@@ -51,19 +51,24 @@ int main(int argc, char **argv) {
 
     //kpp first
     clustering->initialize(inputImages);
-    clustering->lloyds(inputImages, 20);
+    //clustering->lloyds(inputImages, 20);
+    clustering->reverseLSH(inputImages);
 
     //FINISH LSH
     //FINISH CUBE
     //FINISH SILHOUETTE
-    clustering->silhouette(inputImages); //silhouette
+    //clustering->silhouette(inputImages); //silhouette
 
     delete parser;
     delete clustering;
 
+    cout << "HELLO!" << endl;
+
     for (auto image : *inputImages) {
         delete image;
     }
+
+    cout << "HERE!" << endl;
 
     delete inputImages;
 

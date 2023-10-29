@@ -33,8 +33,6 @@ HyperCube::HyperCube(int k, int M, int probes, int N, int R, vector<Image *> *da
 }
 
 HyperCube::~HyperCube() {
-    output.close();
-
     delete cube;
 
     for (auto it : vertices) {
@@ -42,7 +40,9 @@ HyperCube::~HyperCube() {
         delete it.second;
     }
 
-    delete data;
+    if (output.is_open()) {
+        output.close();
+    }
 }
 
 string HyperCube::project(void *pointer) {
@@ -50,7 +50,7 @@ string HyperCube::project(void *pointer) {
     string binary;
 
     for (auto vertex : vertices) {
-        uint h = vertex.first->h(image);
+        uint h = vertex.first->h(image->getCoords());
 
         char bit;
         auto f = vertex.second->find(h);

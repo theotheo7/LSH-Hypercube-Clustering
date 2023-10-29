@@ -8,6 +8,7 @@ Image::Image(uint newId, vector<double> *coords, uint cluster) {
     this->id = newId;
     this->coords = coords;
     this->cluster = cluster;
+    this->assigned = false;
 }
 
 Image::~Image() {
@@ -38,6 +39,10 @@ void Image::setCluster(uint newCluster) {
     cluster = newCluster;
 }
 
-void Image::clear() {
-    this->coords->clear();
+bool Image::getAssigned() {
+    return this->assigned;
+}
+
+void Image::setAssigned(bool newAssigned) {
+    this->assigned = newAssigned;
 }

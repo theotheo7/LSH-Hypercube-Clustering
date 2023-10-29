@@ -15,6 +15,8 @@ private:
     std::vector<double> *coords;
     uint cluster;
 
+    bool assigned;
+
 public:
 
     Image(uint, std::vector<double> *, uint);
@@ -29,7 +31,8 @@ public:
     uint getCluster();
     void setCluster(uint);
 
-    void clear();
+    bool getAssigned();
+    void setAssigned(bool);
 
 };
 

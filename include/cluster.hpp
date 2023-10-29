@@ -32,8 +32,7 @@ public:
     void setImages(std::vector<Image *> *);
 
     void assign(void *);
-    void clearImages();
-    void clearCentroid();
+    void markAllAssigned();
 
     void removeImage(Image *);
 

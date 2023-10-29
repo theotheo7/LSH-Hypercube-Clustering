@@ -46,12 +46,10 @@ void Cluster::assign(void *pointer) {
     image->setCluster(this->id);
 }
 
-void Cluster::clearImages() {
-    this->images->clear();
-}
-
-void Cluster::clearCentroid() {
-    this->centroid->clear();
+void Cluster::markAllAssigned() {
+    for (auto image : *images) {
+        image->setAssigned(true);
+    }
 }
 
 void Cluster::removeImage(Image *image) {

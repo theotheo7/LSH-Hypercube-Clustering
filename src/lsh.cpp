@@ -39,12 +39,37 @@ LSH::LSH(int k, int L,int N, int R, vector<Image *> *data, string outputFile) {
     }
 }
 
+LSH::LSH(int k, int L, int R, vector<Image *> *data) {
+    this->k = k;
+    this->L = L;
+    this->R = R;
+    this->data = data;
+    this->w = 10;
+
+    r.resize(L, vector<int>(0));
+
+    for (int i = 0; i < L; i++) {
+        auto table = new HashTable(data->size() / 100);
+        auto hashFuncs = new vector<HashFunction *>;
+        for (int j = 0; j < k; j++) {
+            hashFuncs->push_back(new HashFunction(w));
+            r[i].push_back(rand());
+        }
+        hashTables.emplace_back(table, hashFuncs);
+    }
+
+    // Populate hash tables with images
+    for (auto image : *data) {
+        insert(image);
+    }
+}
+
 void LSH::insert(Image *image) {
 
     for (int i = 0; i < L; i++) {
         int ID = 0;
         for (int j = 0; j < k; j++) {
-            ID += r[i][j] * hashTables[i].second->at(j)->h(image);
+            ID += r[i][j] * hashTables[i].second->at(j)->h(image->getCoords());
         }
         ID = euclideanModulo(ID, M);
         hashTables[i].first->insert((uint)ID, image);
@@ -55,7 +80,6 @@ void LSH::insert(Image *image) {
 // Function to get approximately nearest neighbors of a given image 'q' using LSH
 void LSH::query(Image* q) {
     list<pair<uint, void *>> neighborsID, neighborsBucket;
-    vector<int> IDs;
     vector<pair<uint, double>> neighborsLSH;
     list<uint> neighborsRNear;
     set<uint> neighborsSet;
@@ -72,10 +96,9 @@ void LSH::query(Image* q) {
     for (int i = 0; i < L; i++) {
         int ID = 0;
         for (int j = 0; j < k; j++) {
-            ID += r[i][j] * hashTables[i].second->at(j)->h(q);
+            ID += r[i][j] * hashTables[i].second->at(j)->h(q->getCoords());
         }
 
-        IDs.push_back(euclideanModulo(ID, M));
         neighborsID.splice(neighborsID.end(), hashTables[i].first->findSameID(ID));
         neighborsBucket.splice(neighborsBucket.end(), hashTables[i].first->findBucket(ID));
     }
@@ -137,6 +160,37 @@ std::vector<double> LSH::getTrueNeighbors(Image *image) {
     return neighborsTrue;
 }
 
+vector<Image *> *LSH::reverseSearch(vector<double> *q, int range) {
+    list<pair<uint, void *>> neighborsBucket;
+    auto neighbors = new vector<Image *>;
+    set<uint> neighborsSet;
+
+    // Gather neighbors from same bucket in all hashtables
+    for (int i = 0; i < L; i++) {
+        int ID = 0;
+        for (int j = 0; j < k; j++) {
+            ID += r[i][j] * hashTables[i].second->at(j)->h(q);
+        }
+
+        neighborsBucket.splice(neighborsBucket.end(), hashTables[i].first->findBucket(ID));
+    }
+
+    // Check if neighbor is in radius and add him to the list
+    for (auto nBucket : neighborsBucket) {
+        auto neighbor = (Image *) nBucket.second;
+        if (neighborsSet.find(neighbor->getId()) == neighborsSet.end()) {
+            double distance = distCoords(q, neighbor->getCoords());
+            if (distance < range) {
+                neighbors->push_back(neighbor);
+            }
+            neighborsSet.insert(neighbor->getId());
+        }
+    }
+
+    cout << neighbors->size() << endl;
+    return neighbors;
+}
+
 void LSH::outputResults(vector<pair<uint, double>> neighborsLSH,
                         vector<double> neighborsTrue, const set<uint>& neighborsRNear,
                         Image *q, double tLSH, double tTrue) {
@@ -167,8 +221,6 @@ void LSH::outputResults(vector<pair<uint, double>> neighborsLSH,
 
 // Destructor for the LSH class
 LSH::~LSH() {
-    delete data;
-
     // Delete each hash table
     for (int i = 0; i < L; i++) {
         delete hashTables[i].first;
@@ -178,6 +230,8 @@ LSH::~LSH() {
         delete hashTables[i].second;
     }
 
-    output.close();
+    if (output.is_open()) {
+        output.close();
+    }
 
 }

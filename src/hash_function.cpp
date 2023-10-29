@@ -8,19 +8,19 @@ HashFunction::HashFunction(int w): generator((rd())), uniDistribution(0.0, (doub
 }
 
 int HashFunction::h(void *pointer) {
-    auto image = (Image *) pointer;
+    auto coords = (vector<double> *) pointer;
 
     double dot = 0.0;
     double rand;
 
     vector<double> v;
 
-    for (size_t i = 0; i < image->getCoords()->size(); i++) {
+    for (size_t i = 0; i < coords->size(); i++) {
         rand = normalDistribution(generator);
         v.push_back(rand * rand);
     }
 
-    vector<double> *p = image->getCoords();
+    vector<double> *p = coords;
 
     for (size_t i = 0; i < v.size(); i++) {
         dot += p->at(i) * v.at(i);

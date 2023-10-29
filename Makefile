@@ -11,8 +11,8 @@ BUILD = build/
 OBJS_LSH = $(BUILD)main_lsh.o $(BUILD)parser.o $(BUILD)utils.o $(BUILD)image.o $(BUILD)hash_function.o $(BUILD)hash_table.o $(BUILD)lsh.o $(BUILD)clustering.o $(BUILD)cluster.o
 SRCS_LSH = $(SRC)main_lsh.cpp $(SRC)parser.cpp $(SRC)utils.cpp $(SRC)image.cpp $(SRC)hash_function.cpp $(SRC)hash_table.cpp $(SRC)lsh.cpp $(BUILD)clustering.cpp $(BUILD)cluster.cpp
 
-OBJS_CUBE = $(BUILD)main_cube.o $(BUILD)parser.o $(BUILD)utils.o $(BUILD)image.o $(BUILD)hash_function.o $(BUILD)hash_table.o $(BUILD)cube.o $(BUILD)clustering.o $(BUILD)cluster.o
-SRCS_CUBE = $(SRC)main_cube.cpp $(SRC)parser.cpp $(SRC)utils.cpp $(SRC)image.cpp $(SRC)hash_function.cpp $(SRC)hash_table.cpp $(SRC)cube.cpp $(BUILD)clustering.cpp $(BUILD)cluster.cpp
+OBJS_CUBE = $(BUILD)main_cube.o $(BUILD)parser.o $(BUILD)utils.o $(BUILD)image.o $(BUILD)hash_function.o $(BUILD)hash_table.o $(BUILD)cube.o $(BUILD)clustering.o $(BUILD)cluster.o $(BUILD)lsh.o
+SRCS_CUBE = $(SRC)main_cube.cpp $(SRC)parser.cpp $(SRC)utils.cpp $(SRC)image.cpp $(SRC)hash_function.cpp $(SRC)hash_table.cpp $(SRC)cube.cpp $(BUILD)clustering.cpp $(BUILD)cluster.cpp $(BUILD)lsh.cpp
 
 OBJS_CLUSTER = $(BUILD)main_cluster.o $(BUILD)parser.o $(BUILD)utils.o $(BUILD)image.o $(BUILD)hash_function.o $(BUILD)hash_table.o $(BUILD)cube.o $(BUILD)lsh.o $(BUILD)cluster.o $(BUILD)clustering.o
 SRCS_CLUSTER = $(BUILD)main_cluster.cpp $(BUILD)parser.cpp $(BUILD)utils.cpp $(BUILD)image.cpp $(BUILD)hash_function.cpp $(BUILD)hash_table.cpp $(BUILD)cube.cpp $(BUILD)lsh.cpp $(BUILD)cluster.cpp $(BUILD)clustering.cpp
@@ -73,7 +73,7 @@ $(CLUSTER): $(OBJS_CLUSTER)
 all: $(LSH) $(CUBE) $(CLUSTER)
 
 clean:
-	rm -f $(OBJS_LSH) $(OBJS_CUBE) $(LSH) $(CUBE)
+	rm -f $(OBJS_LSH) $(OBJS_CUBE) $(OBJS_CLUSTER) $(LSH) $(CUBE) $(CLUSTER)
 
 lsh: $(LSH)
 	./$(LSH) -d resources/input.dat -q resources/query.dat -o resources/outputLSH.txt

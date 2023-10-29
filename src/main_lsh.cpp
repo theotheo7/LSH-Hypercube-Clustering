@@ -63,6 +63,15 @@ int main(int argc, char *argv[]) {
     }
 
     delete parser;
+
+    for (auto image : *inputImages) {
+        delete image;
+    }
+    delete inputImages;
+
+    for (auto image : *queryImages) {
+        delete image;
+    }
     delete queryImages;
 
     return 0;
