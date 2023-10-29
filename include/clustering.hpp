@@ -28,9 +28,11 @@ private:
     std::vector<Cluster *> *clusters;
     std::vector<double> *silhouetteAvg;
 
+    std::ofstream output;
+
 public:
 
-    Clustering(int, int, int, int, int, int);
+    Clustering(int, int, int, int, int, int, std::string);
     ~Clustering();
 
     void initialize(std::vector<Image *> *);
@@ -46,6 +48,8 @@ public:
     Cluster *getClosestCentroid(Image *);
 
     void silhouette(std::vector<Image *> *);
+
+    void outputResults(bool, const std::string&);
 
 };
 

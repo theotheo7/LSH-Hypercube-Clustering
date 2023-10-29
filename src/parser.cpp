@@ -39,7 +39,7 @@ vector<Image *> *Parser::readInputFile(const string &fileName) {
     const uint32_t imageSize = rowNumber * columnNumber;
     vector<unsigned char> inputVector(imageSize);
 
-    for (uint i = 0; i < 1000; i++) {
+    for (uint i = 0; i < imageNumber; i++) {
 
         ifs.read(reinterpret_cast<char *>(inputVector.data()), imageSize);
 
@@ -99,7 +99,7 @@ vector<Image *> *Parser::readQueryFile(const string &fileName) {
     return queryImages;
 }
 
-Clustering *Parser::readClusterConf(const string &fileName) {
+Clustering *Parser::readClusterConf(const string &fileName, const string &outputFile) {
     int clusters = 3;
     int L = 3;
     int kLSH = 4;
@@ -122,27 +122,21 @@ Clustering *Parser::readClusterConf(const string &fileName) {
         while (iss >> token) {
             if (token == "number_of_clusters:") {
                 iss >> clusters;
-                cout << "CLUSTERS: " << clusters << endl;
             } else if (token == "number_of_vector_hash_tables:") {
                 iss >> L;
-                cout << "L: " << L << endl;
             } else if (token == "number_of_vector_hash_functions:") {
                 iss >> kLSH;
-                cout << "kLSH: " << kLSH << endl;
             } else if (token == "max_number_M_hypercube:") {
                 iss >> M;
-                cout << "M: " << M << endl;
             } else if (token == "number_of_hypercube_dimensions:") {
                 iss >> kCube;
-                cout << "kCube: " << kCube << endl;
             } else if (token == "number_of_probes:") {
                 iss >> probes;
-                cout << "Probes: " << probes << endl;
             }
         }
     }
 
     ifs.close();
 
-    return new Clustering(clusters, L, kLSH, M, kCube, probes);
+    return new Clustering(clusters, L, kLSH, M, kCube, probes, outputFile);
 }

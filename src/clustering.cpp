@@ -2,7 +2,7 @@
 
 using namespace std;
 
-Clustering::Clustering(int clusterNum, int L, int kLSH, int M, int kCube, int probes) {
+Clustering::Clustering(int clusterNum, int L, int kLSH, int M, int kCube, int probes, string outputFile) {
 
     this->clusterNum = clusterNum;
     this->L = L;
@@ -14,6 +14,11 @@ Clustering::Clustering(int clusterNum, int L, int kLSH, int M, int kCube, int pr
     this->clusters = new vector<Cluster *>;
     this->silhouetteAvg = new vector<double>;
 
+    output.open(outputFile);
+    if (!output.is_open()) {
+        cerr << "Can't open output file!" << endl;
+        abort();
+    }
 }
 
 Clustering::~Clustering() {
@@ -23,6 +28,8 @@ Clustering::~Clustering() {
     delete clusters;
 
     delete silhouetteAvg;
+
+    output.close();
 }
 
 void Clustering::initialize(vector<Image *> *images) {
@@ -142,14 +149,6 @@ void Clustering::lloyds(std::vector<Image *> *images, int maxTimes) {
 
     } while (maxTimes > 0 && changes > acceptable);
 
-    for (auto cluster : *clusters) {
-        cout << "CLUSTER-" << cluster->getId() << " {" << cluster->getImages()->size() << "}" << endl;
-        for (auto coord : *cluster->getCentroid()) {
-            cout << coord << " ";
-        }
-        cout << endl;
-    }
-
 }
 
 void Clustering::reverseLSH(std::vector<Image *> *images) {
@@ -203,14 +202,6 @@ void Clustering::reverseLSH(std::vector<Image *> *images) {
         }
     }
 
-    for (auto cluster : *clusters) {
-        cout << "CLUSTER-" << cluster->getId() << " {" << cluster->getImages()->size() << "}" << endl;
-        for (auto coord : *cluster->getCentroid()) {
-            cout << coord << " ";
-        }
-        cout << endl;
-    }
-
     delete lsh;
 }
 
@@ -262,14 +253,6 @@ void Clustering::reverseCube(vector<Image *> *images) {
         if (image->getCluster() == 0) {
             getClosestCentroid(image)->assign(image);
         }
-    }
-
-    for (auto cluster : *clusters) {
-        cout << "CLUSTER-" << cluster->getId() << " {" << cluster->getImages()->size() << "}" << endl;
-        for (auto coord : *cluster->getCentroid()) {
-            cout << coord << " ";
-        }
-        cout << endl;
     }
 
     delete cube;
@@ -404,7 +387,6 @@ void Clustering::silhouette(std::vector<Image *> *images) {
     double averageClusterSilhouette = 0.0;
     for (auto cluster : *clusters) {
         const std::vector<Image*> *clusterImages = cluster->getImages();
-        //std::cout << "Cluster Num: " << cluster->getId() << std::endl;
 
         for (auto image : *clusterImages) {
             double ai = averageDistanceToCluster(image, clusters);
@@ -414,30 +396,67 @@ void Clustering::silhouette(std::vector<Image *> *images) {
                 s.push_back(0.0);
             } else {
                 double si = (bi - ai) / std::max(ai, bi);
-                //std::cout << "Image ID: " << image->getId() << std::endl;
-                //std::cout << "Silhouette: " << si << std::endl;
                 s.push_back(si);
                 averageClusterSilhouette += si;
             }
         }
     }
-    //cout << "Silhouette: [";
+
     for (auto cluster : *clusters) {
         double average = 0.0;
         std::vector<Image*> *clusterPoints = cluster->getImages();
         for (auto clusterPoint : *clusterPoints) {
                 average += s[clusterPoint->getId()];
         }
-        //cout << average/(double)clusterPoints->size() << ","; // Print average Silhouette value for each cluster
         silhouetteAvg->push_back(average/(double)clusterPoints->size());
     }
     averageClusterSilhouette /= (double) images->size();
-    //cout << " " << averageClusterSilhouette << "]\n";     // Print average silhouette value for whole dataset
-    //I should clear the s here maybe
-    //return s; // Returning an empty vector since all values are printed for now,I will change it
-
-    silhouetteAvg->push_back(averageClusterSilhouette /= (double) images->size()); // add average silhouette value for whole dataset
+    silhouetteAvg->push_back(averageClusterSilhouette); // add average silhouette value for whole dataset
 }
 
+void Clustering::outputResults(bool complete, const string& method) {
+    string contents;
 
+    if (output.is_open()) {
+        if (method == "Classic") {
+            contents.append("Algorithm: Lloyds\n");
+        } else if (method == "LSH") {
+            contents.append("Algorithm: Range Search LSH\n");
+        } else if (method == "Hypercube") {
+            contents.append("Algorithm Range Search Hypercube\n");
+        }
+
+        for (auto cluster : *clusters) {
+            contents.append("CLUSTER-" + to_string(cluster->getId()) + " {size: " + to_string(cluster->getImages()->size()) + ", centroid: [");
+            for (auto coord : *cluster->getCentroid()) {
+                contents.append(" " + to_string(coord));
+            }
+            contents.append(" ]\n");
+        }
+
+        contents.append("Silhouette: [");
+        for (auto sil : *silhouetteAvg) {
+            contents.append(to_string(sil) + ",");
+        }
+        contents.append("]\n");
+
+        if (complete) {
+            contents.append("\n");
+            for (auto cluster : *clusters) {
+                contents.append("CLUSTER-" + to_string(cluster->getId()) + " {[");
+                for (auto coord : *cluster->getCentroid()) {
+                    contents.append(" " + to_string(coord));
+                }
+                contents.append(" ], ");
+                for (auto image : *cluster->getImages()) {
+                    contents.append(" " + to_string(image->getId()) + ",");
+                }
+                contents.append("}\n");
+            }
+        }
+    }
+
+    contents.append("\n");
+    output << contents;
+}
 

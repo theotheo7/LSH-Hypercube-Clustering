@@ -187,7 +187,6 @@ vector<Image *> *LSH::reverseSearch(vector<double> *q, int range) {
         }
     }
 
-    cout << neighbors->size() << endl;
     return neighbors;
 }
 

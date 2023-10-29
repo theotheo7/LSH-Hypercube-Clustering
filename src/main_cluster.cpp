@@ -12,7 +12,7 @@ using namespace std;
 int main(int argc, char **argv) {
     int opt;
     bool complete = false;
-    string method;
+    string method = "Classic";
 
     string inputFile, confFile, outputFile;
 
@@ -42,17 +42,28 @@ int main(int argc, char **argv) {
         }
     }
 
+    if (inputFile.empty()) {
+        cout << "Please provide input file!" << endl;
+        cin >> inputFile;
+    }
+    if (outputFile.empty()) {
+        cout << "Please provide output file!" << endl;
+        cin >> outputFile;
+    }
+    if (confFile.empty()) {
+        cout << "Please provide conf file!" << endl;
+        cin >> confFile;
+    }
+
     auto parser = new Parser();
     vector<Image *> *inputImages = parser->readInputFile(inputFile);
-    //parser for cluster conf
-    Clustering *clustering = parser->readClusterConf(confFile); //DIMITRIS: just to test the Silhouette,
-                                                                                //          you can delete it
-    cout << "Complete is: " << complete << endl;
+    Clustering *clustering = parser->readClusterConf(confFile, outputFile);
 
-    //kpp first
+    // Initialize using kpp
     clustering->initialize(inputImages);
 
-    /*if (method == "LSH") {
+    // Call specific method for assignment
+    if (method == "LSH") {
         clustering->reverseLSH(inputImages);
     } else if (method == "Hypercube") {
         clustering->reverseCube(inputImages);
@@ -60,8 +71,10 @@ int main(int argc, char **argv) {
         clustering->lloyds(inputImages, 20);
     }
 
+    // Calculate the silhouette
+    clustering->silhouette(inputImages); //silhouette
 
-    clustering->silhouette(inputImages); //silhouette*/
+    clustering->outputResults(complete, method);
 
     delete parser;
     delete clustering;

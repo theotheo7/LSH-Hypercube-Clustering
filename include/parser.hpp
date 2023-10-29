@@ -25,7 +25,7 @@ public:
     std::vector<Image *> *readInputFile(const std::string&);
     std::vector<Image *> *readQueryFile(const std::string&);
 
-    Clustering *readClusterConf(const std::string&);
+    Clustering *readClusterConf(const std::string&, const std::string&);
 };
 
 #endif
