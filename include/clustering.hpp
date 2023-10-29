@@ -26,6 +26,7 @@ private:
     int probes;
 
     std::vector<Cluster *> *clusters;
+    std::vector<double> *silhouetteAvg;
 
 public:
 
@@ -44,7 +45,7 @@ public:
     double minDistanceOfCentroids();
     Cluster *getClosestCentroid(Image *);
 
-    std::vector<double> silhouette(std::vector<Image *> *);
+    void silhouette(std::vector<Image *> *);
 
 };
 

@@ -12,6 +12,7 @@ Clustering::Clustering(int clusterNum, int L, int kLSH, int M, int kCube, int pr
     this->probes = probes;
 
     this->clusters = new vector<Cluster *>;
+    this->silhouetteAvg = new vector<double>;
 
 }
 
@@ -400,7 +401,7 @@ double averageDistanceToNeighborCluster(Image* image, const std::vector<Cluster*
     return 0.0; // No images in the neighbor cluster (or only itself), return 0
 }
 
-std::vector<double> Clustering::silhouette(std::vector<Image *> *images) {
+void Clustering::silhouette(std::vector<Image *> *images) {
     std::vector<double> s;
     double averageClusterSilhouette = 0.0;
     for (auto cluster : *clusters) {
@@ -422,19 +423,22 @@ std::vector<double> Clustering::silhouette(std::vector<Image *> *images) {
             }
         }
     }
-    cout << "Silhouette: [";
+    //cout << "Silhouette: [";
     for (auto cluster : *clusters) {
         double average = 0.0;
         std::vector<Image*> *clusterPoints = cluster->getImages();
         for (auto clusterPoint : *clusterPoints) {
                 average += s[clusterPoint->getId()];
         }
-        cout << average/(double)clusterPoints->size() << ","; // Print average Silhouette value for each cluster
+        //cout << average/(double)clusterPoints->size() << ","; // Print average Silhouette value for each cluster
+        silhouetteAvg->push_back(average/(double)clusterPoints->size());
     }
     averageClusterSilhouette /= (double) images->size();
-    cout << " " << averageClusterSilhouette << "]\n";     // Print average silhouette value for whole dataset
+    //cout << " " << averageClusterSilhouette << "]\n";     // Print average silhouette value for whole dataset
     //I should clear the s here maybe
-    return s; // Returning an empty vector since all values are printed for now,I will change it
+    //return s; // Returning an empty vector since all values are printed for now,I will change it
+
+    silhouetteAvg->push_back(averageClusterSilhouette /= (double) images->size()); // add average silhouette value for whole dataset
 }
 
 
