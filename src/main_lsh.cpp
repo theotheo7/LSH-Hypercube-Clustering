@@ -13,6 +13,8 @@ int main(int argc, char *argv[]) {
     string inputFile, queryFile, outputFile;
     int k = 4, L = 5, N = 1, R = 10000;
 
+    string s;
+
     while((opt = getopt(argc, argv, "d:q:k:L:o:N:R:")) != -1) {
         switch (opt) {
             case 'd':
@@ -41,38 +43,68 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    
-
-    auto parser = new Parser();
-
-    // Read images and queries from files
-    vector<Image *> *inputImages = parser->readInputFile(inputFile);
-    vector<Image *> *queryImages = parser->readQueryFile(queryFile);
-
-    /*if(inputFile.empty() || queryFile.empty()) {
-        cerr << "Input and Query files are mandatory!" << endl;
-        return 1;
-    }*/
-
-    // Initialize LSH with the parsed parameters and input images
-    LSH lsh(k, L, N, R, inputImages, outputFile);
-
-	// Process each query image
-    for(auto queryImage : *queryImages){ //may i need it const here
-        lsh.query(queryImage);
+    if (inputFile.empty()) {
+        cout << "Please provide input file!" << endl;
+        cin >> inputFile;
+    }
+    if (queryFile.empty()) {
+        cout << "Please provide query file!" << endl;
+        cin >> queryFile;
+    }
+    if (outputFile.empty()) {
+        cout << "Please provide output file!" << endl;
+        cin >> outputFile;
     }
 
-    delete parser;
+    do {
+        auto parser = new Parser();
 
-    for (auto image : *inputImages) {
-        delete image;
-    }
-    delete inputImages;
+        // Read images and queries from files
+        vector<Image *> *inputImages = parser->readInputFile(inputFile);
+        vector<Image *> *queryImages = parser->readQueryFile(queryFile);
 
-    for (auto image : *queryImages) {
-        delete image;
-    }
-    delete queryImages;
+        /*if(inputFile.empty() || queryFile.empty()) {
+            cerr << "Input and Query files are mandatory!" << endl;
+            return 1;
+        }*/
+
+        // Initialize LSH with the parsed parameters and input images
+        LSH lsh(k, L, N, R, inputImages, outputFile);
+
+        // Process each query image
+        for(auto queryImage : *queryImages){ //may i need it const here
+            lsh.query(queryImage);
+        }
+
+        delete parser;
+
+        for (auto image : *inputImages) {
+            delete image;
+        }
+        delete inputImages;
+
+        for (auto image : *queryImages) {
+            delete image;
+        }
+        delete queryImages;
+
+        cout << "Query finished! Would you like to query again? (y/n)" << endl;
+        cin >> s;
+        if (s == "y") {
+            if (inputFile.empty()) {
+                cout << "Please provide input file!" << endl;
+                cin >> inputFile;
+            }
+            if (queryFile.empty()) {
+                cout << "Please provide query file!" << endl;
+                cin >> queryFile;
+            }
+            if (outputFile.empty()) {
+                cout << "Please provide output file!" << endl;
+                cin >> outputFile;
+            }
+        }
+    } while (s != "n");
 
     return 0;
 }
