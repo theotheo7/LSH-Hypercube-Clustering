@@ -114,25 +114,33 @@ Clustering *Parser::readClusterConf(const string &fileName) {
         return nullptr;
     }
 
-    /*string line;
+    string line;
     while (getline(ifs, line)) {
         istringstream iss(line);
-        string key;
+        string token;
 
-        if (key == "number_of_clusters: ") {
-            iss >> clusters;
-        } else if (key == "number_of_vector_hash_tables: ") {
-            iss >> L;
-        } else if (key == "number_of_vector_hash_functions: ") {
-            iss >> kLSH;
-        } else if (key == "max_number_M_hypercube: ") {
-            iss >> M;
-        } else if (key == "number_of_hypercube_dimensions: ") {
-            iss >> kCube;
-        } else if (key == "number_of_probes: ") {
-            iss >> probes;
+        while (iss >> token) {
+            if (token == "number_of_clusters:") {
+                iss >> clusters;
+                cout << "CLUSTERS: " << clusters << endl;
+            } else if (token == "number_of_vector_hash_tables:") {
+                iss >> L;
+                cout << "L: " << L << endl;
+            } else if (token == "number_of_vector_hash_functions:") {
+                iss >> kLSH;
+                cout << "kLSH: " << kLSH << endl;
+            } else if (token == "max_number_M_hypercube:") {
+                iss >> M;
+                cout << "M: " << M << endl;
+            } else if (token == "number_of_hypercube_dimensions:") {
+                iss >> kCube;
+                cout << "kCube: " << kCube << endl;
+            } else if (token == "number_of_probes:") {
+                iss >> probes;
+                cout << "Probes: " << probes << endl;
+            }
         }
-    }*/
+    }
 
     ifs.close();
 

@@ -20,8 +20,9 @@ Clustering::~Clustering() {
     for (auto cluster : *clusters) {
         delete cluster;
     }
-
     delete clusters;
+
+    delete silhouetteAvg;
 }
 
 void Clustering::initialize(vector<Image *> *images) {
@@ -313,12 +314,9 @@ double Clustering::minDistanceOfCentroids() {
         for (int j = 0; j < clusterNum; j++) {
             // Dont check same centroids
             if (i != j) {
-                cout << "Calculating distance!!" << endl;
                 distance = distCoords(clusters->at(i)->getCentroid(), clusters->at(j)->getCentroid());
-                cout << "Distance is: " << distance << endl;
 
                 if (distance < minDist) {
-                    cout << "CHANGING MIN DIST" << endl;
                     minDist = distance;
                 }
             }

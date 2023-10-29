@@ -43,16 +43,16 @@ int main(int argc, char **argv) {
     }
 
     auto parser = new Parser();
-    vector<Image *> *inputImages = parser->readInputFile("resources/input.dat");
+    vector<Image *> *inputImages = parser->readInputFile(inputFile);
     //parser for cluster conf
-    //Clustering *clustering = parser->readClusterConf(confFile);
-    Clustering *clustering = parser->readClusterConf("resources/cluster.conf"); //DIMITRIS: just to test the Silhouette,
+    Clustering *clustering = parser->readClusterConf(confFile); //DIMITRIS: just to test the Silhouette,
                                                                                 //          you can delete it
+    cout << "Complete is: " << complete << endl;
 
     //kpp first
     clustering->initialize(inputImages);
 
-    if (method == "LSH") {
+    /*if (method == "LSH") {
         clustering->reverseLSH(inputImages);
     } else if (method == "Hypercube") {
         clustering->reverseCube(inputImages);
@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
     }
 
 
-    clustering->silhouette(inputImages); //silhouette
+    clustering->silhouette(inputImages); //silhouette*/
 
     delete parser;
     delete clustering;
