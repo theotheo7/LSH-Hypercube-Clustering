@@ -33,12 +33,14 @@ private:
 public:
 
     HyperCube(int, int, int, int, int, std::vector<Image *> *data, std::string);
+    HyperCube(int, int, int, std::vector<Image *> *);
     ~HyperCube();
 
-    std::string project(void *);
+    std::string project(std::vector<double> *);
 
     void insert(void *);
     void query(void *);
+    std::vector<Image *> *reverseSearch(std::vector<double> *, int);
 
     std::priority_queue<double, std::vector<double>, std::greater<>> getTrueNeighbors(void *);
 

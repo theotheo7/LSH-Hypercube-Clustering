@@ -52,7 +52,8 @@ int main(int argc, char **argv) {
     //kpp first
     clustering->initialize(inputImages);
     //clustering->lloyds(inputImages, 20);
-    clustering->reverseLSH(inputImages);
+    //clustering->reverseLSH(inputImages);
+    clustering->reverseCube(inputImages);
 
     //FINISH LSH
     //FINISH CUBE

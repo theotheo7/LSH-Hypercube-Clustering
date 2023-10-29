@@ -11,6 +11,7 @@
 #include "image.hpp"
 #include "utils.hpp"
 #include "lsh.hpp"
+#include "cube.hpp"
 
 class Cluster;
 
@@ -32,13 +33,14 @@ public:
     ~Clustering();
 
     void initialize(std::vector<Image *> *);
-    Cluster *selectRandomly(std::vector<Image *> *);
+    static Cluster *selectRandomly(std::vector<Image *> *);
 
     void lloyds(std::vector<Image *> *, int);
     void reverseLSH(std::vector<Image *> *);
+    void reverseCube(std::vector<Image *> *);
 
-    void updateMacQueenInsert(Cluster *);
-    void updateMacQueen(Cluster *);
+    static void updateMacQueenInsert(Cluster *);
+    static void updateMacQueen(Cluster *);
     double minDistanceOfCentroids();
     Cluster *getClosestCentroid(Image *);
 

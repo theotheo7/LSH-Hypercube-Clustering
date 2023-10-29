@@ -58,7 +58,7 @@ void Clustering::initialize(vector<Image *> *images) {
         }
 
         // Find sum of all distances
-        long double totalDist = 0;
+        double totalDist = 0;
         for (int j = 0; j < numOfImages; j++) {
             totalDist += minDist.at(j);
         }
@@ -114,7 +114,6 @@ void Clustering::lloyds(std::vector<Image *> *images, int maxTimes) {
     int changes;
     int numOfImages = (int) images->size();
     int acceptable = numOfImages / 500;
-    double distance;
 
     do {
         cout << "Running.." << endl;
@@ -152,8 +151,7 @@ void Clustering::lloyds(std::vector<Image *> *images, int maxTimes) {
 }
 
 void Clustering::reverseLSH(std::vector<Image *> *images) {
-    int R = minDistanceOfCentroids();
-    cout << "Starting R: " << R << endl;
+    int R = (int) minDistanceOfCentroids();
     int RMax = 100000;
 
     vector<Image *> *neighbors;
@@ -214,12 +212,73 @@ void Clustering::reverseLSH(std::vector<Image *> *images) {
     delete lsh;
 }
 
+void Clustering::reverseCube(vector<Image *> *images) {
+    int R = (int) minDistanceOfCentroids();
+    int RMax = 100000;
+
+    vector<Image *> *neighbors;
+
+    auto cube = new HyperCube(kCube, M, probes, images);
+
+    do {
+        cout << "Running.." << endl;
+        for (auto cluster : *clusters) {
+            neighbors = cube->reverseSearch(cluster->getCentroid(), R);
+
+            if (neighbors->empty()) {
+                continue;
+            }
+
+            for (auto neighbor : *neighbors) {
+                // If it has already been assigned skip it
+                if (neighbor->getAssigned()) {
+                    continue;
+                }
+
+                // If image is not in cluster assign it
+                if (neighbor->getCluster() == 0) {
+                    cluster->assign(neighbor);
+                } else if (neighbor->getCluster() != 0 && !neighbor->getAssigned()) { // Image was assigned this iteration but there is conflict
+                    clusters->at(neighbor->getCluster() - 1)->removeImage(neighbor);
+                    getClosestCentroid(neighbor)->assign(neighbor);
+                }
+            }
+
+            delete neighbors;
+        }
+
+        for (auto cluster : *clusters) {
+            cluster->markAllAssigned();
+            updateMacQueen(cluster);
+        }
+
+        R *= 2;
+
+    } while (R < RMax);
+
+    for (auto image : *images) {
+        if (image->getCluster() == 0) {
+            getClosestCentroid(image)->assign(image);
+        }
+    }
+
+    for (auto cluster : *clusters) {
+        cout << "CLUSTER-" << cluster->getId() << " {" << cluster->getImages()->size() << "}" << endl;
+        for (auto coord : *cluster->getCentroid()) {
+            cout << coord << " ";
+        }
+        cout << endl;
+    }
+
+    delete cube;
+}
+
 // Function to update centroid when a single image gets assigned to its cluster
 void Clustering::updateMacQueenInsert(Cluster *cluster) {
-    int sizeOfCoords = cluster->getCentroid()->size();
+    int sizeOfCoords = (int) cluster->getCentroid()->size();
 
     auto coords = cluster->getCentroid();
-    int imageNum = cluster->getImages()->size();
+    int imageNum = (int) cluster->getImages()->size();
 
     for (int i = 0; i < sizeOfCoords; i++) {
         double newImageCoord = cluster->getImages()->back()->getCoords()->at(i);
@@ -230,10 +289,10 @@ void Clustering::updateMacQueenInsert(Cluster *cluster) {
 
 // Slower function to update centroid regardless of insertion or removal of image
 void Clustering::updateMacQueen(Cluster *cluster) {
-    int sizeOfCoords = cluster->getCentroid()->size();
+    int sizeOfCoords = (int) cluster->getCentroid()->size();
 
     auto coords = cluster->getCentroid();
-    int imageNum = cluster->getImages()->size();
+    int imageNum = (int) cluster->getImages()->size();
 
     for (int i = 0; i < sizeOfCoords; i++) {
         double total = 0;
@@ -330,7 +389,7 @@ double averageDistanceToNeighborCluster(Image* image, const std::vector<Cluster*
             totalDistance += distance;
         }
 
-        int neighborClusterSize = neighborClusterImages->size();
+        int neighborClusterSize = (int) neighborClusterImages->size();
 
         if (neighborClusterSize > 0) {
             double averageDistance = totalDistance / neighborClusterSize;
@@ -364,15 +423,15 @@ std::vector<double> Clustering::silhouette(std::vector<Image *> *images) {
         }
     }
     cout << "Silhouette: [";
-    for (unsigned int i = 0; i < clusters->size(); i++) {
+    for (auto cluster : *clusters) {
         double average = 0.0;
-        std::vector<Image*> *clusterPoints = clusters->at(i)->getImages();
-        for (unsigned int j = 0; j < clusterPoints->size(); j++) {
-                average += s[clusterPoints->at(j)->getId()];
+        std::vector<Image*> *clusterPoints = cluster->getImages();
+        for (auto clusterPoint : *clusterPoints) {
+                average += s[clusterPoint->getId()];
         }
-        cout << average/clusterPoints->size() << ","; // Print average Silhouette value for each cluster
+        cout << average/(double)clusterPoints->size() << ","; // Print average Silhouette value for each cluster
     }
-    averageClusterSilhouette /= images->size();
+    averageClusterSilhouette /= (double) images->size();
     cout << " " << averageClusterSilhouette << "]\n";     // Print average silhouette value for whole dataset
     //I should clear the s here maybe
     return s; // Returning an empty vector since all values are printed for now,I will change it

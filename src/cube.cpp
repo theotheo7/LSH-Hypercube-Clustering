@@ -32,6 +32,27 @@ HyperCube::HyperCube(int k, int M, int probes, int N, int R, vector<Image *> *da
     }
 }
 
+HyperCube::HyperCube(int k, int M, int probes, std::vector<Image *> *data) {
+
+    this->k = k;
+    this->M = M;
+    this->probes = probes;
+    this->w = 10;
+    this->data = data;
+
+    this->vertices.reserve(k);
+    this->cube = new HashTable((int)pow(2, k));
+
+    for (int i = 0; i < k; i++) {
+        pair<HashFunction *, unordered_map<uint, char> *> temp = make_pair(new HashFunction(w), new unordered_map<uint, char>());
+        this->vertices.push_back(temp);
+    }
+
+    for (auto image : *data) {
+        insert(image);
+    }
+}
+
 HyperCube::~HyperCube() {
     delete cube;
 
@@ -45,12 +66,11 @@ HyperCube::~HyperCube() {
     }
 }
 
-string HyperCube::project(void *pointer) {
-    auto image = (Image *) pointer;
+string HyperCube::project(vector<double> *coords) {
     string binary;
 
     for (auto vertex : vertices) {
-        uint h = vertex.first->h(image->getCoords());
+        uint h = vertex.first->h(coords);
 
         char bit;
         auto f = vertex.second->find(h);
@@ -69,7 +89,7 @@ string HyperCube::project(void *pointer) {
 
 void HyperCube::insert(void *pointer) {
     auto image = (Image *) pointer;
-    string binary = project(image);
+    string binary = project(image->getCoords());
 
     cube->insert(binaryToUint(binary), image);
 
@@ -81,7 +101,7 @@ void HyperCube::query(void *pointer) {
     int probesChecked = 0;
     int pointsChecked;
 
-    list<pair<uint, void *>> neighborsID, neighborsBucket;
+    list<pair<uint, void *>> neighborsID;
     vector<pair<uint, double>> neighborsCube;
     list<uint> neighborsRNear;
     vector<int> *neighborVertices;
@@ -95,7 +115,7 @@ void HyperCube::query(void *pointer) {
     tTrue = endTrue - startTrue;
 
     auto startCube = chrono::high_resolution_clock::now();
-    string binary = project(image);
+    string binary = project(image->getCoords());
     neighborsID = cube->findBucket(binaryToUint(binary));
 
     probesChecked++;
@@ -132,6 +152,47 @@ void HyperCube::query(void *pointer) {
     tCube = endCube - startCube;
 
     outputResults(neighborsCube, neighborsTrue, neighborsRNear, image, tCube.count(), tTrue.count());
+}
+
+vector<Image *> *HyperCube::reverseSearch(vector<double> *q, int range) {
+    auto neighbors = new vector<Image *>;
+    list<pair<uint, void *>> neighborsID;
+    vector<int> *neighborVertices;
+
+    string binary = project(q);
+    neighborsID = cube->findBucket(binaryToUint(binary));
+
+    int probesChecked = 0;
+    int pointsChecked;
+
+    probesChecked++;
+    pointsChecked = (int)neighborsID.size();
+
+    // Gather neighboring vertices from hypercube
+    int hammingDist = 1;
+    while (probesChecked < probes && pointsChecked < M) {
+        neighborVertices = hammingDistance(binary, hammingDist++);
+        for (auto i : *neighborVertices) {
+            neighborsID.splice(neighborsID.begin(), cube->findBucket(i));
+            pointsChecked = (int) neighborsID.size();
+            probesChecked++;
+            if (probesChecked == probes || pointsChecked > M) {
+                break;
+            }
+        }
+        delete neighborVertices;
+    }
+
+    for (auto neighbor : neighborsID) {
+        auto neighborImage = (Image *) neighbor.second;
+        double distance = distCoords(neighborImage->getCoords(), q);
+
+        if (distance < range) {
+            neighbors->push_back(neighborImage);
+        }
+    }
+
+    return neighbors;
 }
 
 priority_queue<double, vector<double>, greater<>> HyperCube::getTrueNeighbors(void *pointer) {

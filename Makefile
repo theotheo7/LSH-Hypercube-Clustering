@@ -8,14 +8,14 @@ INCLUDE = include/
 RESOURCES = resources/
 BUILD = build/
 
-OBJS_LSH = $(BUILD)main_lsh.o $(BUILD)parser.o $(BUILD)utils.o $(BUILD)image.o $(BUILD)hash_function.o $(BUILD)hash_table.o $(BUILD)lsh.o $(BUILD)clustering.o $(BUILD)cluster.o
-SRCS_LSH = $(SRC)main_lsh.cpp $(SRC)parser.cpp $(SRC)utils.cpp $(SRC)image.cpp $(SRC)hash_function.cpp $(SRC)hash_table.cpp $(SRC)lsh.cpp $(BUILD)clustering.cpp $(BUILD)cluster.cpp
+OBJS_LSH = $(BUILD)main_lsh.o $(BUILD)parser.o $(BUILD)utils.o $(BUILD)image.o $(BUILD)hash_function.o $(BUILD)hash_table.o $(BUILD)lsh.o $(BUILD)clustering.o $(BUILD)cluster.o $(BUILD)cube.o
+SRCS_LSH = $(SRC)main_lsh.cpp $(SRC)parser.cpp $(SRC)utils.cpp $(SRC)image.cpp $(SRC)hash_function.cpp $(SRC)hash_table.cpp $(SRC)lsh.cpp $(SRC)clustering.cpp $(SRC)cluster.cpp $(SRC)cube.cpp
 
-OBJS_CUBE = $(BUILD)main_cube.o $(BUILD)parser.o $(BUILD)utils.o $(BUILD)image.o $(BUILD)hash_function.o $(BUILD)hash_table.o $(BUILD)cube.o $(BUILD)clustering.o $(BUILD)cluster.o $(BUILD)lsh.o
-SRCS_CUBE = $(SRC)main_cube.cpp $(SRC)parser.cpp $(SRC)utils.cpp $(SRC)image.cpp $(SRC)hash_function.cpp $(SRC)hash_table.cpp $(SRC)cube.cpp $(BUILD)clustering.cpp $(BUILD)cluster.cpp $(BUILD)lsh.cpp
+OBJS_CUBE = $(BUILD)main_cube.o $(BUILD)parser.o $(BUILD)utils.o $(BUILD)image.o $(BUILD)hash_function.o $(BUILD)hash_table.o $(BUILD)cube.o $(BUILD)lsh.o $(BUILD)clustering.o $(BUILD)cluster.o
+SRCS_CUBE = $(SRC)main_cube.cpp $(SRC)parser.cpp $(SRC)utils.cpp $(SRC)image.cpp $(SRC)hash_function.cpp $(SRC)hash_table.cpp $(SRC)cube.cpp $(SRC)lsh.cpp $(SRC)clustering.cpp $(SRC)cluster.cpp
 
 OBJS_CLUSTER = $(BUILD)main_cluster.o $(BUILD)parser.o $(BUILD)utils.o $(BUILD)image.o $(BUILD)hash_function.o $(BUILD)hash_table.o $(BUILD)cube.o $(BUILD)lsh.o $(BUILD)cluster.o $(BUILD)clustering.o
-SRCS_CLUSTER = $(BUILD)main_cluster.cpp $(BUILD)parser.cpp $(BUILD)utils.cpp $(BUILD)image.cpp $(BUILD)hash_function.cpp $(BUILD)hash_table.cpp $(BUILD)cube.cpp $(BUILD)lsh.cpp $(BUILD)cluster.cpp $(BUILD)clustering.cpp
+SRCS_CLUSTER = $(SRC)main_cluster.cpp $(SRC)parser.cpp $(SRC)utils.cpp $(SRC)image.cpp $(SRC)hash_function.cpp $(SRC)hash_table.cpp $(SRC)cube.cpp $(SRC)lsh.cpp $(SRC)cluster.cpp $(SRC)clustering.cpp
 
 LSH = $(BUILD)lsh
 
@@ -62,15 +62,15 @@ $(BUILD)clustering.o: $(SRC)clustering.cpp $(INCLUDE)clustering.hpp
 
 # Executables
 $(LSH): $(OBJS_LSH)
-	$(CC) $(OBJS_LSH) $(CFLAGS) -o $(LSH)
+	$(CC) $(CFLAGS) -o $(LSH) $(OBJS_LSH)
 
 $(CUBE): $(OBJS_CUBE)
-	$(CC) $(OBJS_CUBE) $(CFLAGS) -o $(CUBE)
+	$(CC) $(CFLAGS) -o $(CUBE) $(OBJS_CUBE)
 
 $(CLUSTER): $(OBJS_CLUSTER)
-	$(CC) $(OBJS_CLUSTER) $(CFLAGS) -o $(CLUSTER)
+	$(CC) $(CFLAGS) -o $(CLUSTER) $(OBJS_CLUSTER)
 
-all: $(LSH) $(CUBE) $(CLUSTER)
+all: $(CLUSTER) $(CUBE) $(LSH)
 
 clean:
 	rm -f $(OBJS_LSH) $(OBJS_CUBE) $(OBJS_CLUSTER) $(LSH) $(CUBE) $(CLUSTER)
